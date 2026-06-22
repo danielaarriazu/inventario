@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- ENUMS (Opciones cerradas) ---
+enum EstadoDestino {
+  ALTA
+  BAJA
+}
+
+enum DominioConexion {
+  RINA
+  INTERNET_ARA
+  INTERNET
+  SIN_CONEXION
+}
+
+enum SistemaOperativo {
+  WINDOWS_10
+  WINDOWS_11
+}
+
+enum Arquitectura {
+  BITS_64
+  BITS_32
+}
+
+enum TipoRAM {
+  DDR
+  DDR2
+  DDR3
+  DDR4
+  DDR5
+}
+
+enum EstadoEquipo {
+  ACTIVO
+  BAJA
+  REPARACION
+}
+
+// --- TABLAS ORGÁNICAS ---
+model Destino {
+  id_destino     Int             @id @default(autoincrement())
+  cod_destino    Int             @unique
+  nombre_destino String
+  descripcion    String?         // El "?" lo hace opcional
+  estado         EstadoDestino   @default(ALTA)
+  departamentos  Departamento[]
+}
+
+model Departamento {
+  id_departamento     Int          @id @default(autoincrement())
+  nombre_departamento String
+  abreviatura         String
+  id_destino          Int
+  destino             Destino      @relation(fields: [id_destino], references: [id_destino])
+  divisiones          Division[]
+}
+
+model Division {
+  id_division     Int               @id @default(autoincrement())
+  nombre_division String
+  abreviatura     String
+  id_departamento Int
+  departamento    Departamento      @relation(fields: [id_departamento], references: [id_departamento])
+  equipos         Planilla_Equipo[]
+}
+
+// --- TABLA PRINCIPAL ---
+model Planilla_Equipo {
+  id_planilla         Int       @id @default(autoincrement())
+  numero_equipo       String    @unique // Ej: CO.I.001
+  correlativo_dominio Int
+  
+  // Ubicación y Responsabilidad
+  id_division         Int
+  division            Division  @relation(fields: [id_division], references: [id_division])
+  numero_oficina      String    // Ubicación física actual
+  usuario_responsable String
+  
+  // Info de Red
+  nombre_equipo       String
+  nombre_usuario_red  String
+  dominio_conexion    DominioConexion
+  
+  // Software
+  sistema_operativo   SistemaOperativo
+  arquitectura        Arquitectura
+  
+  // Hardware y Periféricos
+  procesador          String
+  tipo_ram            TipoRAM
+  ram_capacidad       String    // Ej: "8 GB"
+  disco               String
+  hardware_otros      String?   // El "?" significa que es opcional
+  monitor_modelo      String?
+  monitor_tamano      String?
+  impresora_modelo    String?
+  impresora_insumos   String?
+  tiene_teclado       Boolean   @default(true)
+  tiene_mouse         Boolean   @default(true)
+  perifericos_otros   String?
+  
+  // Control Interno
+  codigo_qr           String?   @unique
+  estado_equipo       EstadoEquipo  @default(ACTIVO)
+  fecha_creacion      DateTime  @default(now())
+
+  // Relación con el historial
+  historial           Historial_Modificacion[]
+}
+
+// --- TABLA DE AUDITORÍA ---
+model Historial_Modificacion {
+  id_historial       Int             @id @default(autoincrement())
+  id_planilla        Int
+  planilla           Planilla_Equipo @relation(fields: [id_planilla], references: [id_planilla])
+  fecha_modificacion DateTime        @default(now())
+  motivo_cambio      String
+  detalle_cambios    String          // Podemos guardar un JSON en texto con lo que cambió
+}
