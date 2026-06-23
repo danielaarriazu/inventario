@@ -60,6 +60,7 @@ model Departamento {
   nombre_departamento String
   abreviatura         String
   id_destino          Int
+  estado              EstadoDestino   @default(ALTA)
   destino             Destino      @relation(fields: [id_destino], references: [id_destino])
   divisiones          Division[]
 }
@@ -69,6 +70,7 @@ model Division {
   nombre_division String
   abreviatura     String
   id_departamento Int
+  estado              EstadoDestino   @default(ALTA)
   departamento    Departamento      @relation(fields: [id_departamento], references: [id_departamento])
   equipos         Planilla_Equipo[]
 }
