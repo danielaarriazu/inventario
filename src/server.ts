@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cros from 'cors';
 import destinoRoutes from './routes/destino.routes';

@@ -1,0 +1,265 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Inventario Patrimonial",
+    "version": "1.0.0",
+    "description": "Documentación oficial de los endpoints del sistema de inventario patrimonial. Maneja la estructura orgánica (Destinos, Departamentos, Divisiones), el hardware y la auditoría automática."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local de Desarrollo"
+    }
+  ],
+  "tags": [
+    { "name": "Destinos", "description": "Nivel más alto de la jerarquía" },
+    { "name": "Departamentos", "description": "Subdivisión de los Destinos" },
+    { "name": "Divisiones", "description": "Subdivisión de los Departamentos" },
+    { "name": "Equipos", "description": "Gestión de hardware y planillas" },
+    { "name": "Auditoria", "description": "Trazabilidad y control de cambios" }
+  ],
+  "paths": {
+    "/api/destinos": {
+      "get": {
+        "summary": "Obtener todos los destinos",
+        "tags": ["Destinos"],
+        "responses": {
+          "200": { "description": "Lista de destinos activos" }
+        }
+      },
+      "post": {
+        "summary": "Crear un nuevo destino",
+        "tags": ["Destinos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DestinoInput" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Destino creado" },
+          "400": { "description": "Error en validación" }
+        }
+      }
+    },
+    "/api/destinos/{id}": {
+      "put": {
+        "summary": "Actualizar un destino",
+        "tags": ["Destinos"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "ID del destino" }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DestinoInput" } }
+          }
+        },
+        "responses": { "200": { "description": "Destino actualizado" } }
+      },
+      "delete": {
+        "summary": "Baja Lógica de un destino",
+        "tags": ["Destinos"],
+        "parameters": [
+          { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Dado de baja exitosamente" } }
+      }
+    },
+    "/api/departamentos": {
+      "get": {
+        "summary": "Obtener todos los departamentos",
+        "tags": ["Departamentos"],
+        "responses": { "200": { "description": "Lista de departamentos activos" } }
+      },
+      "post": {
+        "summary": "Crear departamento",
+        "tags": ["Departamentos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DepartamentoInput" } }
+          }
+        },
+        "responses": { "201": { "description": "Creado exitosamente" } }
+      }
+    },
+    "/api/departamentos/{id}": {
+      "put": {
+        "summary": "Actualizar departamento",
+        "tags": ["Departamentos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DepartamentoInput" } } } },
+        "responses": { "200": { "description": "Actualizado" } }
+      },
+      "delete": {
+        "summary": "Baja Lógica departamento",
+        "tags": ["Departamentos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Baja exitosa" } }
+      }
+    },
+    "/api/divisiones": {
+      "get": {
+        "summary": "Obtener todas las divisiones",
+        "tags": ["Divisiones"],
+        "responses": { "200": { "description": "Lista de divisiones activas" } }
+      },
+      "post": {
+        "summary": "Crear división",
+        "tags": ["Divisiones"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DivisionInput" } }
+          }
+        },
+        "responses": { "201": { "description": "Creado exitosamente" } }
+      }
+    },
+    "/api/divisiones/{id}": {
+      "put": {
+        "summary": "Actualizar división",
+        "tags": ["Divisiones"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DivisionInput" } } } },
+        "responses": { "200": { "description": "Actualizada" } }
+      },
+      "delete": {
+        "summary": "Baja Lógica división",
+        "tags": ["Divisiones"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Baja exitosa" } }
+      }
+    },
+    "/api/equipos": {
+      "get": {
+        "summary": "Obtener todos los equipos",
+        "tags": ["Equipos"],
+        "responses": { "200": { "description": "Planilla completa de equipos" } }
+      },
+      "post": {
+        "summary": "Registrar nuevo equipo",
+        "tags": ["Equipos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/EquipoInput" } }
+          }
+        },
+        "responses": { "201": { "description": "Equipo registrado" } }
+      }
+    },
+    "/api/equipos/{id}": {
+      "put": {
+        "summary": "Actualizar equipo (genera auditoría automática)",
+        "tags": ["Equipos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EquipoInput" } } } },
+        "responses": { "200": { "description": "Actualizado y auditado" } }
+      },
+      "delete": {
+        "summary": "Baja lógica equipo",
+        "tags": ["Equipos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Pasado a estado BAJA" } }
+      }
+    },
+    "/api/auditoria": {
+      "get": {
+        "summary": "Ver historial completo",
+        "description": "Trae todos los movimientos de todos los equipos ordenados por fecha.",
+        "tags": ["Auditoria"],
+        "responses": { "200": { "description": "Historial global" } }
+      },
+      "post": {
+        "summary": "Crear registro de auditoría manual",
+        "tags": ["Auditoria"],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/AuditoriaInput" } }
+          }
+        },
+        "responses": { "201": { "description": "Movimiento registrado" } }
+      }
+    },
+    "/api/auditoria/equipo/{id}": {
+      "get": {
+        "summary": "Ver historial de un equipo",
+        "description": "Devuelve la hoja de vida (timeline) de una máquina específica.",
+        "tags": ["Auditoria"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Historial del equipo" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DestinoInput": {
+        "type": "object",
+        "required": ["cod_destino", "nombre_destino"],
+        "properties": {
+          "cod_destino": { "type": "integer", "example": 101 },
+          "nombre_destino": { "type": "string", "example": "Secretaría General" },
+          "descripcion": { "type": "string", "example": "Edificio Libertad" }
+        }
+      },
+      "DepartamentoInput": {
+        "type": "object",
+        "required": ["nombre_departamento", "abreviatura", "id_destino"],
+        "properties": {
+          "nombre_departamento": { "type": "string", "example": "Departamento de Informática" },
+          "abreviatura": { "type": "string", "example": "DEPINFO" },
+          "id_destino": { "type": "integer", "example": 1 }
+        }
+      },
+      "DivisionInput": {
+        "type": "object",
+        "required": ["nombre_division", "abreviatura", "id_departamento"],
+        "properties": {
+          "nombre_division": { "type": "string", "example": "División Soporte Técnico" },
+          "abreviatura": { "type": "string", "example": "DIVSOP" },
+          "id_departamento": { "type": "integer", "example": 1 }
+        }
+      },
+      "EquipoInput": {
+        "type": "object",
+        "required": [
+          "numero_equipo", "correlativo_dominio", "id_division", "numero_oficina", 
+          "usuario_responsable", "nombre_equipo", "nombre_usuario_red", "dominio_conexion", 
+          "sistema_operativo", "arquitectura", "procesador", "tipo_ram", "ram_capacidad", "disco"
+        ],
+        "properties": {
+          "numero_equipo": { "type": "string", "example": "CO.I.001" },
+          "correlativo_dominio": { "type": "integer", "example": 12345 },
+          "id_division": { "type": "integer", "example": 1 },
+          "numero_oficina": { "type": "string", "example": "Piso 2, Of 14" },
+          "usuario_responsable": { "type": "string", "example": "Sgto. Juan Perez" },
+          "nombre_equipo": { "type": "string", "example": "PC-SOPORTE-01" },
+          "nombre_usuario_red": { "type": "string", "example": "jperez" },
+          "dominio_conexion": { "type": "string", "enum": ["RINA", "INTERNET_ARA", "INTERNET", "SIN_CONEXION"], "example": "RINA" },
+          "sistema_operativo": { "type": "string", "enum": ["WINDOWS_10", "WINDOWS_11"], "example": "WINDOWS_10" },
+          "arquitectura": { "type": "string", "enum": ["BITS_64", "BITS_32"], "example": "BITS_64" },
+          "procesador": { "type": "string", "example": "Intel Core i5-10400" },
+          "tipo_ram": { "type": "string", "enum": ["DDR", "DDR2", "DDR3", "DDR4", "DDR5"], "example": "DDR4" },
+          "ram_capacidad": { "type": "string", "example": "16 GB" },
+          "disco": { "type": "string", "example": "512GB SSD" },
+          "tiene_teclado": { "type": "boolean", "example": true },
+          "tiene_mouse": { "type": "boolean", "example": true },
+          "estado_equipo": { "type": "string", "enum": ["ACTIVO", "BAJA", "REPARACION"], "example": "ACTIVO" }
+        }
+      },
+      "AuditoriaInput": {
+        "type": "object",
+        "required": ["id_planilla", "motivo_cambio", "detalle_cambios"],
+        "properties": {
+          "id_planilla": { "type": "integer", "example": 1 },
+          "motivo_cambio": { "type": "string", "example": "Actualización de Hardware" },
+          "detalle_cambios": { 
+            "type": "object", 
+            "example": { "disco": { "antes": "1TB HDD", "despues": "256GB SSD" } }
+          }
+        }
+      }
+    }
+  }
+}

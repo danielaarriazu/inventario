@@ -6,6 +6,7 @@ export const getDestinos = async (req: Request, res: Response) => {
     const destinos = await destinoService.obtenerTodosLosDestinos();
     res.status(200).json(destinos);
   } catch (error) {
+    console.error("🚨 ERROR REAL EN GET DESTINOS:", error);
     res.status(500).json({ error: 'Error interno al obtener los destinos' });
   }
 };
