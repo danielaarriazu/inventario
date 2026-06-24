@@ -5,6 +5,8 @@ import departamentoRoutes from './routes/departamento.routes';
 import divisionRoutes from './routes/division.routes';
 import equipoRoutes from './routes/equipo.routes';
 import auditoriaRoutes from './routes/auditoria.routes';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './docs/swagger.json';
 
 const app = express();
 app.use(cros());
@@ -14,6 +16,7 @@ app.get('/api/status', (req, res) => {
   res.json({ mensaje: '¡El servidor del inventario está corriendo perfecto!' });
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/destinos', destinoRoutes);
 app.use('/api/departamentos', departamentoRoutes); 
 app.use('/api/divisiones', divisionRoutes);      
