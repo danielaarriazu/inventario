@@ -2,13 +2,12 @@ services:
   - type: web
     name: inventario-backend
     env: node
-    # Los comandos que Render va a ejecutar por nosotros
+    plan: free
     buildCommand: npm install && npm run build && npx prisma db push
     startCommand: npm start
-    # Le avisamos a Render que este proyecto necesita estas dos contraseñas
-    # (sync: false significa que por seguridad no guardamos la clave real acá, 
-    # sino que Render nos la va a pedir por pantalla la primera vez)
     envVars:
+     - key: NODE_VERSION
+        value: 20
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL
