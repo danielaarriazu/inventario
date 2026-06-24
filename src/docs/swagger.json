@@ -5,7 +5,11 @@
     "version": "1.0.0",
     "description": "Documentación oficial de los endpoints del sistema de inventario patrimonial. Maneja la estructura orgánica (Destinos, Departamentos, Divisiones), el hardware y la auditoría automática."
   },
-  "servers": [
+ "servers": [
+    {
+      "url": "https://inventario-backend-inic.onrender.com",
+      "description": "Servidor de Producción (Render)"
+    },
     {
       "url": "http://localhost:3000",
       "description": "Servidor Local de Desarrollo"
