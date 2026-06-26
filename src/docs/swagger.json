@@ -169,6 +169,27 @@
         "responses": { "200": { "description": "Pasado a estado BAJA" } }
       }
     },
+    "/api/equipos/{id}/qr": {
+      "get": {
+        "summary": "Generar etiqueta QR",
+        "description": "Devuelve la imagen del código QR codificada en Base64 lista para ser renderizada en una etiqueta o pantalla.",
+        "tags": ["Equipos"],
+        "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { 
+            "description": "QR generado exitosamente",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "QR generado exitosamente",
+                  "qr_image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auditoria": {
       "get": {
         "summary": "Ver historial completo",
