@@ -20,7 +20,8 @@
     { "name": "Departamentos", "description": "Subdivisión de los Destinos" },
     { "name": "Divisiones", "description": "Subdivisión de los Departamentos" },
     { "name": "Equipos", "description": "Gestión de hardware y planillas" },
-    { "name": "Auditoria", "description": "Trazabilidad y control de cambios" }
+    { "name": "Auditoria", "description": "Trazabilidad y control de cambios" },
+    { "name": "Reportes", "description": "Generación de informes y exportaciones" }
   ],
   "paths": {
     "/api/destinos": {
@@ -193,6 +194,29 @@
         "tags": ["Auditoria"],
         "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "integer" } }],
         "responses": { "200": { "description": "Historial del equipo" } }
+      }
+    },
+    "/api/reportes/excel": {
+      "get": {
+        "summary": "Exportar inventario a Excel",
+        "description": "Genera y descarga un archivo Excel (.xlsx) con todos los equipos activos, agrupando cada Destino en una pestaña separada.",
+        "tags": ["Reportes"],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel generado exitosamente. Se iniciará la descarga en el navegador.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno al generar el archivo Excel."
+          }
+        }
       }
     }
   },
