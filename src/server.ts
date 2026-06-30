@@ -7,6 +7,7 @@ import divisionRoutes from './routes/division.routes';
 import equipoRoutes from './routes/equipo.routes';
 import auditoriaRoutes from './routes/auditoria.routes';
 import reporteRoutes from './routes/reporte.routes';
+import authRoutes from './routes/auth.routes';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './docs/swagger.json';
@@ -26,6 +27,7 @@ app.use('/api/divisiones', divisionRoutes);
 app.use('/api/equipos', equipoRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/reportes', reporteRoutes);
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 

@@ -5,12 +5,13 @@ import {
   updateEquipo, 
   softDeleteEquipo 
 } from '../controllers/equipo.controller';
+import { verificarToken, soloResponsable } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.get('/', getEquipos);
-router.post('/', createEquipo);
-router.put('/:id', updateEquipo);
-router.delete('/:id', softDeleteEquipo);
+router.get('/', verificarToken, getEquipos);
+router.post('/', verificarToken, createEquipo);
+router.put('/:id', verificarToken, updateEquipo);
+router.delete('/:id', verificarToken, soloResponsable, softDeleteEquipo);
 
 export default router;

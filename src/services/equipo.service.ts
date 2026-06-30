@@ -1,9 +1,16 @@
 import prisma from '../config/db';
 
-export const obtenerEquipos = async () => {
+export const obtenerEquipos = async (id_cargo: number) => {
   return await prisma.planilla_Equipo.findMany({
-    where: { 
-      NOT: { estado_equipo: 'BAJA' } 
+    where: {
+      // Magia de Prisma: Buscamos solo los equipos cuyo destino pertenezca a este cargo
+      division: {
+        departamento: {
+          destino: {
+            id_cargo: id_cargo
+          }
+        }
+      }
     },
     include: {
       division: {

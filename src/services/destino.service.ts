@@ -1,8 +1,10 @@
 import prisma from '../config/db';
 
-export const obtenerTodosLosDestinos = async () => {
+export const obtenerTodosLosDestinos = async (id_cargo: number) => {
   return await prisma.destino.findMany({
-    where: { estado: 'ALTA' }
+    where: { 
+      id_cargo,
+      estado: 'ALTA' }
   });
 };
 

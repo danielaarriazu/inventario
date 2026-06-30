@@ -3,7 +3,8 @@ import * as destinoService from '../services/destino.service';
 
 export const getDestinos = async (req: Request, res: Response) => {
   try {
-    const destinos = await destinoService.obtenerTodosLosDestinos();
+    const id_cargo = req.usuario!.id_cargo;
+    const destinos = await destinoService.obtenerTodosLosDestinos(id_cargo);
     res.status(200).json(destinos);
   } catch (error) {
     console.error("🚨 ERROR REAL EN GET DESTINOS:", error);

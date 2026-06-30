@@ -45,6 +45,35 @@ enum EstadoEquipo {
   REPARACION
 }
 
+enum RolUsuario {
+  RESPONSABLE    
+  SUBORDINADO  
+}
+model Cargo {
+  id_cargo     Int       @id @default(autoincrement())
+  nombre_cargo String    
+  estado       Boolean   @default(true) 
+
+  
+  usuarios     Usuario[] 
+  destinos     Destino[] 
+}
+
+model Usuario {
+  id_usuario   Int        @id @default(autoincrement())
+  jerarquia     String
+  nombre_apellido  String     
+  mr    String     @unique 
+  password     String     
+  rol          RolUsuario @default(SUBORDINADO)
+  estado       Boolean    @default(true) 
+
+  id_cargo     Int
+  cargo        Cargo      @relation(fields: [id_cargo], references: [id_cargo])
+
+  movimientos  Historial_Modificacion[]
+}
+
 // --- TABLAS ORGÁNICAS ---
 model Destino {
   id_destino     Int             @id @default(autoincrement())
@@ -52,6 +81,10 @@ model Destino {
   nombre_destino String
   descripcion    String?         // El "?" lo hace opcional
   estado         EstadoDestino   @default(ALTA)
+
+  id_cargo       Int
+  cargo          Cargo           @relation(fields: [id_cargo], references: [id_cargo])
+
   departamentos  Departamento[]
 }
 
@@ -99,9 +132,9 @@ model Planilla_Equipo {
   // Hardware y Periféricos
   procesador          String
   tipo_ram            TipoRAM
-  ram_capacidad       String    // Ej: "8 GB"
+  ram_capacidad       String    
   disco               String
-  hardware_otros      String?   // El "?" significa que es opcional
+  hardware_otros      String?   
   monitor_modelo      String?
   monitor_tamano      String?
   impresora_modelo    String?
@@ -124,6 +157,10 @@ model Historial_Modificacion {
   id_historial       Int             @id @default(autoincrement())
   id_planilla        Int
   planilla           Planilla_Equipo @relation(fields: [id_planilla], references: [id_planilla])
+  
+  id_usuario         Int?
+  usuario            Usuario?        @relation(fields: [id_usuario], references: [id_usuario])
+
   fecha_modificacion DateTime        @default(now())
   motivo_cambio      String
   detalle_cambios    String          // Podemos guardar un JSON en texto con lo que cambió

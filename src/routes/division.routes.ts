@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { getDivisiones, createDivision, updateDivision, softDeleteDivision } from '../controllers/division.controller';
+import { verificarToken, soloResponsable } from '../middlewares/auth.middleware';
 
 const router = Router();
-router.get('/', getDivisiones);
-router.post('/', createDivision);
-router.put('/:id', updateDivision);
-router.delete('/:id', softDeleteDivision);
+router.get('/', verificarToken, getDivisiones);
+router.post('/', verificarToken, createDivision);
+router.put('/:id', verificarToken, updateDivision);
+router.delete('/:id', verificarToken, soloResponsable, softDeleteDivision);
 export default router;

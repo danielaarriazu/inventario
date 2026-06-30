@@ -3,7 +3,8 @@ import * as equipoService from '../services/equipo.service';
 
 export const getEquipos = async (req: Request, res: Response) => {
   try {
-    const equipos = await equipoService.obtenerEquipos();
+    const id_cargo = req.usuario!.id_cargo;
+    const equipos = await equipoService.obtenerEquipos(id_cargo);
     res.status(200).json(equipos);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener la planilla de equipos' });

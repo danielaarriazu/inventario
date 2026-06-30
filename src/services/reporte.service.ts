@@ -1,11 +1,18 @@
 import prisma from '../config/db';
 import ExcelJS from 'exceljs';
 
-export const generarExcelInventario = async () => {
+export const generarExcelInventario = async (id_cargo: number) => {
   // 1. Traemos todos los equipos activos (sin los de BAJA) con su ruta completa
   const equipos = await prisma.planilla_Equipo.findMany({
     where: { 
-      NOT: { estado_equipo: 'BAJA' } 
+      NOT: { estado_equipo: 'BAJA' } ,
+      division: {
+        departamento: {
+          destino: {
+            id_cargo 
+          }
+        }
+      }
     },
     include: {
       division: {

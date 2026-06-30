@@ -3,7 +3,8 @@ import * as reporteService from '../services/reporte.service';
 
 export const exportarExcel = async (req: Request, res: Response) => {
   try {
-    const buffer = await reporteService.generarExcelInventario();
+    const id_cargo = req.usuario!.id_cargo;
+    const buffer = await reporteService.generarExcelInventario(id_cargo);
     
     // Le decimos al navegador que esto es un archivo de Microsoft Excel
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
