@@ -9,9 +9,10 @@ export const obtenerTodosLosDestinos = async (id_cargo: number) => {
 };
 
 
-export const crearNuevoDestino = async (cod_destino: number, nombre_destino: string, descripcion?: string) => {
+export const crearNuevoDestino = async (id_cargo: number,cod_destino: number, nombre_destino: string, descripcion?: string) => {
   return await prisma.destino.create({
     data: {
+      id_cargo,      
       cod_destino,
       nombre_destino,
       descripcion

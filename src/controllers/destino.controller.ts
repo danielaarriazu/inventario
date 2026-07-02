@@ -15,13 +15,15 @@ export const getDestinos = async (req: Request, res: Response) => {
 export const createDestino = async (req: Request, res: Response) => {
   try {
     const { cod_destino, nombre_destino, descripcion } = req.body;
+
+    const id_cargo = req.usuario!.id_cargo;
     
     if (!cod_destino || !nombre_destino) {
        res.status(400).json({ error: 'El código y el nombre del destino son obligatorios' });
        return;
     }
 
-    const nuevoDestino = await destinoService.crearNuevoDestino(cod_destino, nombre_destino, descripcion);
+    const nuevoDestino = await destinoService.crearNuevoDestino(id_cargo, cod_destino, nombre_destino, descripcion);
     res.status(201).json(nuevoDestino);
   } catch (error) {
     res.status(500).json({ error: 'Error al crear el destino. Verifique que el código no esté repetido.' });

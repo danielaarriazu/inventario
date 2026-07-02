@@ -11,7 +11,16 @@
     "moduleResolution": "node",
     "verbatimModuleSyntax": false,
     "ignoreDeprecations": "6.0",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    
+    /* Agregamos esto para que lea tu carpeta de tipos personalizada */
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
+  
+  /* Le decimos a ts-node que cargue los archivos .d.ts obligatoriamente */
+  "ts-node": {
+    "files": true
+  },
+  
   "include": ["src/**/*"]
 }
