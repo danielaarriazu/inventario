@@ -1,22 +1,27 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import RegistroCargo from './components/RegistroCargo';
+import Dashboard from './pages/Dashboard';
+import Auxiliares from './pages/Auxiliares';
 
 function App() {
   return (
-    // BrowserRouter envuelve la app para permitir la navegación por URLs
     <BrowserRouter>
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen bg-gray-100 flex flex-col">
         <Routes>
-          {/* Cuando la URL está vacía (/), muestra el Login */}
-          <Route path="/" element={<LoginForm />} />
+          <Route path="/" element={
+            <div className="flex-grow flex items-center justify-center"><LoginForm /></div>
+          } />
+          <Route path="/registro" element={
+            <div className="flex-grow flex items-center justify-center"><RegistroCargo /></div>
+          } />
+          <Route path="/dashboard" element={<Dashboard />} />
           
-          {/* Cuando la URL es /registro, muestra el formulario de Alta */}
-          <Route path="/registro" element={<RegistroCargo />} />
+          {/* Ruta actualizada sin caracteres conflictivos */}
+          <Route path="/dashboard/auxiliares" element={<Auxiliares />} />
         </Routes>
       </div>
     </BrowserRouter>
   );
 }
-
 export default App;
