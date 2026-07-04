@@ -17,7 +17,7 @@ export default function Auxiliares() {
 
   const fetchAuxiliares = async () => {
     try {
-      const response = await api.get('/usuarios/companeros');
+      const response = await api.get('/auth/companeros');
       setAuxiliares(response.data);
     } catch (error) {
       console.error("Error al obtener los auxiliares", error);

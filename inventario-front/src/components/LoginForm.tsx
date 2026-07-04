@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import api from '../services/api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // <-- Agregamos useNavigate aquí
 
 export default function LoginForm() {
   const [mr, setMr] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // <-- Inicializamos el navegador interno
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await api.post('/auth/login', { mr, password });
+      
+      // Guardamos el token en la memoria del navegador
       localStorage.setItem('token', response.data.token);
-      alert('¡Bienvenida al sistema!');
-      // Aquí redirigiremos al Dashboard en el siguiente paso
+      
+      // ¡Acá está la magia! Redirigimos directo al Dashboard
+      navigate('/dashboard'); 
     } catch (error) {
       alert('Error: Matrícula o contraseña incorrecta');
     }

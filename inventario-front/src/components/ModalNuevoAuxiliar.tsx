@@ -25,7 +25,7 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
     }
 
     try {
-      await api.post('/usuarios/companeros', {
+      await api.post('/auth/companeros', {
         mr,
         nombre,
         rol

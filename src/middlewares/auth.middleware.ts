@@ -37,3 +37,22 @@ export const soloResponsable = (req: Request, res: Response, next: NextFunction)
     res.status(403).json({ error: 'Acceso restringido. Esta acción solo puede ser realizada por el Responsable del cargo.' });
   }
 };
+
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'No autorizado. Token inexistente o inválido.' });
+    return;
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
+    (req as any).user = decoded; // Guardamos los datos descifrados (id_cargo, rol, etc.)
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Token inválido o expirado.' });
+  }
+};
