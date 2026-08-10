@@ -6,19 +6,25 @@ export const generarExcelInventario = async (id_cargo: number) => {
   const equipos = await prisma.planilla_Equipo.findMany({
     where: { 
       NOT: { estado_equipo: 'BAJA' } ,
-      division: {
-        departamento: {
-          destino: {
-            id_cargo 
+      oficina: {
+        division: {
+          departamento: {
+            destino: {
+              id_cargo 
+            }
           }
         }
       }
     },
     include: {
-      division: {
+      oficina: {
         include: {
-          departamento: {
-            include: { destino: true }
+          division: {
+            include: {
+              departamento: {
+                include: { destino: true }
+              }
+            }
           }
         }
       }
@@ -30,7 +36,7 @@ export const generarExcelInventario = async (id_cargo: number) => {
   const equiposPorDestino: Record<string, any[]> = {};
   
   equipos.forEach(eq => {
-    const nombreDestino = eq.division.departamento.destino.nombre_destino;
+    const nombreDestino = eq.oficina.division.departamento.destino.nombre_destino;
     if (!equiposPorDestino[nombreDestino]) {
       equiposPorDestino[nombreDestino] = [];
     }
@@ -72,9 +78,9 @@ export const generarExcelInventario = async (id_cargo: number) => {
     equiposPorDestino[destino].forEach(eq => {
       sheet.addRow({
         numero_equipo: eq.numero_equipo,
-        departamento: eq.division.departamento.nombre_departamento,
-        division: eq.division.nombre_division,
-        oficina: eq.numero_oficina,
+        departamento: eq.oficina.division.departamento.nombre_departamento,
+        division: eq.oficina.division.nombre_division,
+        oficina: eq.oficina.numero_oficina,
         responsable: eq.usuario_responsable,
         nombre_red: eq.nombre_equipo,
         dominio: eq.dominio_conexion,
