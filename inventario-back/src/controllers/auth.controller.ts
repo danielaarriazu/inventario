@@ -36,12 +36,12 @@ export const login = async (req: Request, res: Response) => {
 };
 export const registrarAuxiliar = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { mr, nombre, rol, jerarquia } = req.body;
+    const { mr, nombre, rol, jerarquia, password } = req.body;
     // req.usuario viene del middleware verificarToken con los datos descifrados del JWT
     const id_cargo = req.usuario!.id_cargo;
 
-    if (!mr || !nombre || !rol) {
-      res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    if (!mr || !nombre || !rol || !password) {
+      res.status(400).json({ error: 'Todos los campos son obligatorios, incluida la contraseña' });
       return;
     }
 
@@ -52,16 +52,14 @@ export const registrarAuxiliar = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    // Le asignamos una contraseña por defecto (ej: la misma matrícula o "123456") 
-    // encriptada para que puedan iniciar sesión
-    const passwordHasheada = await bcrypt.hash(mr, 10);
+    const passwordHasheada = await bcrypt.hash(password, 10);
 
     const nuevoAuxiliar = await prisma.usuario.create({
       data: {
         mr,
         nombre_apellido: nombre,
         password: passwordHasheada,
-        rol, // OPERADOR, AUDITOR, ENCARGADO, etc.
+        rol, // RESPONSABLE o SUBORDINADO
         jerarquia,
         id_cargo // Se vincula automáticamente a tu mismo cargo
       }

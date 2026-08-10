@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
-import { X, UserPlus } from 'lucide-react';
+import { X, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -13,6 +13,8 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
   const [nombre, setNombre] = useState('');
   const [jerarquia, setJerarquia] = useState('');
   const [rol, setRol] = useState('SUBORDINADO');
+  const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [errorForm, setErrorForm] = useState('');
 
   if (!isOpen) return null;
@@ -21,12 +23,13 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
     e.preventDefault();
     setErrorForm('');
     try {
-      await api.post('/auth/companeros', { mr, nombre, jerarquia, rol });
+      await api.post('/auth/companeros', { mr, nombre, jerarquia, rol, password });
 
       setMr('');
       setNombre('');
       setJerarquia('');
       setRol('SUBORDINADO');
+      setPassword('');
       onAuxiliarCreado();
       onClose();
     } catch (error: any) {
@@ -80,6 +83,24 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
               onChange={(e) => setJerarquia(e.target.value)}
               className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
             />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Contraseña de acceso</label>
+            <div className="relative">
+              <input
+                type={mostrarPassword ? 'text' : 'password'} required placeholder="Definí una contraseña" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-borde rounded p-2.5 pr-10 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
+              />
+              <button
+                type="button"
+                onClick={() => setMostrarPassword(!mostrarPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-texto-sec hover:text-primario cursor-pointer"
+              >
+                {mostrarPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-1">
