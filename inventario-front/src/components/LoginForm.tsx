@@ -1,49 +1,62 @@
 import { useState } from 'react';
 import api from '../services/api';
-import { Link, useNavigate } from 'react-router-dom'; // <-- Agregamos useNavigate aquí
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
   const [mr, setMr] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // <-- Inicializamos el navegador interno
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     try {
       const response = await api.post('/auth/login', { mr, password });
-      
-      // Guardamos el token en la memoria del navegador
       localStorage.setItem('token', response.data.token);
-      
-      // ¡Acá está la magia! Redirigimos directo al Dashboard
-      navigate('/dashboard'); 
-    } catch (error) {
-      alert('Error: Matrícula o contraseña incorrecta');
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Matrícula o contraseña incorrecta');
     }
   };
 
   return (
     <div className="flex flex-col items-center">
-      <form onSubmit={handleLogin} className="space-y-4 p-8 bg-white rounded-xl shadow-lg w-96 border border-gray-200">
-        <h2 className="text-2xl font-bold text-blue-900 text-center mb-6">Acceso al Sistema</h2>
-        <input 
-          type="text" placeholder="M.R." value={mr}
-          onChange={(e) => setMr(e.target.value)}
-          className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
-        />
-        <input 
-          type="password" placeholder="Contraseña" value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
-        />
-        <button type="submit" className="w-full bg-blue-900 text-white font-bold p-3 rounded hover:bg-blue-800 transition-colors">
+      <form onSubmit={handleLogin} className="space-y-4 p-8 bg-superficie rounded-xl shadow-lg w-96 border border-borde">
+        <div className="text-center mb-6">
+          <div className="text-2xl mb-1">⚓</div>
+          <h2 className="text-xl font-bold text-primario">Sistema de Inventario Patrimonial</h2>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-baja/10 text-baja border border-baja/30 rounded text-sm text-center font-semibold">
+            {error}
+          </div>
+        )}
+
+        <div>
+          <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">M.R.</label>
+          <input
+            type="text" placeholder="4021" value={mr}
+            onChange={(e) => setMr(e.target.value)}
+            className="w-full mt-1 p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Contraseña</label>
+          <input
+            type="password" placeholder="••••••••" value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mt-1 p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
+          />
+        </div>
+        <button type="submit" className="w-full bg-primario text-white font-bold p-3 rounded hover:bg-primario-hover transition-colors cursor-pointer">
           Ingresar
         </button>
       </form>
-      
-      {/* Botón para ir a crear el Cargo */}
+
       <div className="mt-6">
-        <Link to="/registro" className="text-blue-900 hover:underline text-sm font-semibold">
+        <Link to="/registro" className="text-acento hover:underline text-sm font-semibold">
           ¿No tenés sistema asignado? Registrar un Cargo
         </Link>
       </div>

@@ -7,7 +7,7 @@ import Auxiliares from './pages/Auxiliares';
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-fondo flex flex-col">
         <Routes>
           <Route path="/" element={
             <div className="flex-grow flex items-center justify-center"><LoginForm /></div>

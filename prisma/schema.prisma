@@ -120,7 +120,7 @@ model Division {
   id_departamento Int
   estado              EstadoDestino   @default(ALTA)
   departamento    Departamento      @relation(fields: [id_departamento], references: [id_departamento])
-  oficina          Oficina[]
+  oficinas          Oficina[]
 }
 
 model Oficina {
@@ -144,7 +144,6 @@ model Planilla_Equipo {
   // Ubicación y Responsabilidad
   id_oficina         Int
   oficina            Oficina  @relation(fields: [id_oficina], references: [id_oficina])
-  numero_oficina      String    // Ubicación física actual
   usuario_responsable String
   
   // Info de Red

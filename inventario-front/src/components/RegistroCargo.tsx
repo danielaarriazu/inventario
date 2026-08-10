@@ -12,7 +12,7 @@ export default function RegistroCargo() {
   });
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,12 +23,11 @@ export default function RegistroCargo() {
     e.preventDefault();
     setMensaje('');
     setError('');
-    
+
     try {
       await api.post('/auth/registrar-cargo', formData);
       setMensaje('Cargo y Responsable creados exitosamente.');
-      // Esperamos 2 segundos y lo mandamos a la pantalla de Login
-      setTimeout(() => navigate('/'), 2000); 
+      setTimeout(() => navigate('/'), 2000);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Ocurrió un error al registrar el cargo');
     }
@@ -36,54 +35,55 @@ export default function RegistroCargo() {
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto mt-10">
-      <form onSubmit={handleSubmit} className="space-y-4 p-8 bg-white rounded-xl shadow-lg w-full border border-gray-200">
-        
+      <form onSubmit={handleSubmit} className="space-y-4 p-8 bg-superficie rounded-xl shadow-lg w-full border border-borde">
+
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-blue-900">Alta de Nuevo Cargo</h2>
-          <p className="text-sm text-gray-500 mt-1">Configure el cargo y el responsable</p>
+          <div className="text-2xl mb-1">⚓</div>
+          <h2 className="text-xl font-bold text-primario">Alta de Nuevo Cargo</h2>
+          <p className="text-sm text-texto-sec mt-1">Configure el cargo y el responsable</p>
         </div>
 
-        {mensaje && <div className="p-3 bg-green-100 text-green-800 rounded text-sm text-center font-semibold">{mensaje}</div>}
-        {error && <div className="p-3 bg-red-100 text-red-800 rounded text-sm text-center font-semibold">{error}</div>}
+        {mensaje && <div className="p-3 bg-activo/10 text-activo border border-activo/30 rounded text-sm text-center font-semibold">{mensaje}</div>}
+        {error && <div className="p-3 bg-baja/10 text-baja border border-baja/30 rounded text-sm text-center font-semibold">{error}</div>}
 
-        <input 
-          type="text" name="nombre_cargo" placeholder="Nombre del Cargo (Ej: Informática Central)" 
+        <input
+          type="text" name="nombre_cargo" placeholder="Nombre del Cargo (Ej: Informática Central)"
           value={formData.nombre_cargo} onChange={handleChange} required
-          className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
+          className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
         />
-        
+
         <div className="grid grid-cols-2 gap-4">
-          <input 
-            type="text" name="jerarquia" placeholder="Jerarquía" 
+          <input
+            type="text" name="jerarquia" placeholder="Jerarquía"
             value={formData.jerarquia} onChange={handleChange} required
-            className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
+            className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
           />
-          <input 
-            type="text" name="mr" placeholder="M.R." 
+          <input
+            type="text" name="mr" placeholder="M.R."
             value={formData.mr} onChange={handleChange} required
-            className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
+            className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
           />
         </div>
 
-        <input 
-          type="text" name="nombre_apellido" placeholder="Nombre y Apellido" 
+        <input
+          type="text" name="nombre_apellido" placeholder="Nombre y Apellido"
           value={formData.nombre_apellido} onChange={handleChange} required
-          className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
+          className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
         />
 
-        <input 
-          type="password" name="password" placeholder="Contraseña de acceso" 
+        <input
+          type="password" name="password" placeholder="Contraseña de acceso"
           value={formData.password} onChange={handleChange} required
-          className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-blue-900 outline-none"
+          className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
         />
 
-        <button type="submit" className="w-full bg-blue-900 text-white font-bold p-3 rounded hover:bg-blue-800 transition-colors">
+        <button type="submit" className="w-full bg-primario text-white font-bold p-3 rounded hover:bg-primario-hover transition-colors cursor-pointer">
           Registrar Cargo
         </button>
       </form>
-      
+
       <div className="mt-4">
-        <Link to="/" className="text-blue-900 hover:underline text-sm font-semibold">
+        <Link to="/" className="text-acento hover:underline text-sm font-semibold">
           ← Volver al Inicio de Sesión
         </Link>
       </div>
