@@ -126,6 +126,9 @@ export default function Dashboard() {
             destinos.map(destino => (
               <div
                 key={destino.id_destino}
+                onClick={() => navigate(`/dashboard/destinos/${destino.id_destino}/departamentos`, {
+                  state: { nombreDestino: destino.nombre_destino }
+                })}
                 className="group bg-superficie p-6 rounded-xl border border-borde hover:border-acento/50 shadow-sm transition-colors cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-4">

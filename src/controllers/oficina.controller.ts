@@ -3,7 +3,8 @@ import * as oficinaService from '../services/oficina.service';
 
 export const getOficinas = async (req: Request, res: Response) => {
   try {
-    const oficinas = await oficinaService.obtenerOficinas();
+    const id_division = req.query.id_division ? parseInt(req.query.id_division as string, 10) : undefined;
+    const oficinas = await oficinaService.obtenerOficinas(id_division);
     res.status(200).json(oficinas);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener las oficinas' });

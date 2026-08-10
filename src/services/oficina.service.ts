@@ -1,8 +1,11 @@
 import prisma from '../config/db';
 
-export const obtenerOficinas = async () => {
+export const obtenerOficinas = async (id_division?: number) => {
   return await prisma.oficina.findMany({
-    where: { estado: 'ALTA' },
+    where: {
+      estado: 'ALTA',
+      ...(id_division ? { id_division } : {})
+    },
     include: { division: true }
   });
 };

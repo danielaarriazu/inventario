@@ -3,7 +3,8 @@ import * as departamentoService from '../services/departamento.service';
 
 export const getDepartamentos = async (req: Request, res: Response) => {
   try {
-    const departamentos = await departamentoService.obtenerDepartamentos();
+    const id_destino = req.query.id_destino ? parseInt(req.query.id_destino as string, 10) : undefined;
+    const departamentos = await departamentoService.obtenerDepartamentos(id_destino);
     res.status(200).json(departamentos);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los departamentos' });

@@ -3,6 +3,7 @@ import LoginForm from './components/LoginForm';
 import RegistroCargo from './components/RegistroCargo';
 import Dashboard from './pages/Dashboard';
 import Auxiliares from './pages/Auxiliares';
+import Departamentos from './pages/Departamentos';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           
           {/* Ruta actualizada sin caracteres conflictivos */}
           <Route path="/dashboard/auxiliares" element={<Auxiliares />} />
+          <Route path="/dashboard/destinos/:idDestino/departamentos" element={<Departamentos />} />
         </Routes>
       </div>
     </BrowserRouter>
