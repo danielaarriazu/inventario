@@ -4,6 +4,8 @@ import RegistroCargo from './components/RegistroCargo';
 import Dashboard from './pages/Dashboard';
 import Auxiliares from './pages/Auxiliares';
 import Departamentos from './pages/Departamentos';
+import Divisiones from './pages/Divisiones';
+import Oficinas from './pages/Oficinas';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           {/* Ruta actualizada sin caracteres conflictivos */}
           <Route path="/dashboard/auxiliares" element={<Auxiliares />} />
           <Route path="/dashboard/destinos/:idDestino/departamentos" element={<Departamentos />} />
+          <Route path="/dashboard/departamentos/:idDepartamento/divisiones" element={<Divisiones />} />
+          <Route path="/dashboard/divisiones/:idDivision/oficinas" element={<Oficinas />} />
         </Routes>
       </div>
     </BrowserRouter>
