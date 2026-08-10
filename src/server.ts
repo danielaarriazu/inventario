@@ -4,10 +4,12 @@ import cros from 'cors';
 import destinoRoutes from './routes/destino.routes';
 import departamentoRoutes from './routes/departamento.routes';
 import divisionRoutes from './routes/division.routes';
+import oficinaRoutes from './routes/oficina.routes';
 import equipoRoutes from './routes/equipo.routes';
 import auditoriaRoutes from './routes/auditoria.routes';
 import reporteRoutes from './routes/reporte.routes';
 import authRoutes from './routes/auth.routes';
+
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './docs/swagger.json';
@@ -25,6 +27,7 @@ app.use('/api/destinos', destinoRoutes);
 app.use('/api/departamentos', departamentoRoutes); 
 app.use('/api/divisiones', divisionRoutes);      
 app.use('/api/equipos', equipoRoutes);
+app.use('/api/oficinas', oficinaRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/reportes', reporteRoutes);
 app.use('/api/auth', authRoutes);
