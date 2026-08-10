@@ -3,6 +3,7 @@ services:
     name: inventario-backend
     env: node
     plan: free
+    rootDir: inventario-back
     buildCommand: npm install && npm run build && npx prisma db push
     startCommand: npm start
     envVars:
@@ -10,3 +11,13 @@ services:
         sync: false
       - key: DIRECT_URL
         sync: false
+
+  - type: web
+    name: inventario-frontend
+    runtime: static
+    rootDir: inventario-front
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://inventario-backend.onrender.com/api
