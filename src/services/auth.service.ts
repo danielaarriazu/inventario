@@ -10,7 +10,13 @@ export const crearCargoYAdmin = async (
   mr: string,
   password_plana: string
 ) => {
-  
+
+  // Por ahora el sistema es de un solo Cargo: si ya existe uno, no se permite crear otro.
+  const cargosExistentes = await prisma.cargo.count();
+  if (cargosExistentes > 0) {
+    throw new Error('El sistema ya tiene un Cargo registrado. Por ahora no se permite crear cargos adicionales.');
+  }
+
   // Verificamos que la matrícula no exista ya
   const existe = await prisma.usuario.findUnique({ where: { mr } });
   if (existe) throw new Error('La M.R ya está registrada en el sistema');
