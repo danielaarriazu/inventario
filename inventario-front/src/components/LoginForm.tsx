@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import api from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginForm() {
   const [mr, setMr] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -44,11 +46,20 @@ export default function LoginForm() {
         </div>
         <div>
           <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Contraseña</label>
-          <input
-            type="password" placeholder="••••••••" value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mt-1 p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
-          />
+          <div className="relative mt-1">
+            <input
+              type={mostrarPassword ? 'text' : 'password'} placeholder="••••••••" value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2.5 pr-10 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
+            />
+            <button
+              type="button"
+              onClick={() => setMostrarPassword(!mostrarPassword)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-texto-sec hover:text-primario cursor-pointer"
+            >
+              {mostrarPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
         <button type="submit" className="w-full bg-primario text-white font-bold p-3 rounded hover:bg-primario-hover transition-colors cursor-pointer">
           Ingresar

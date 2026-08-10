@@ -8,6 +8,9 @@ import Auxiliares from './pages/Auxiliares';
 import Departamentos from './pages/Departamentos';
 import Divisiones from './pages/Divisiones';
 import Oficinas from './pages/Oficinas';
+import Equipos from './pages/Equipos';
+import AltaPlanilla from './pages/AltaPlanilla';
+import Ficha from './pages/Ficha';
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
           <Route path="/dashboard/destinos/:idDestino/departamentos" element={<Departamentos />} />
           <Route path="/dashboard/departamentos/:idDepartamento/divisiones" element={<Divisiones />} />
           <Route path="/dashboard/divisiones/:idDivision/oficinas" element={<Oficinas />} />
+          <Route path="/dashboard/equipos" element={<Equipos />} />
+          <Route path="/dashboard/equipos/nuevo" element={<AltaPlanilla />} />
+          <Route path="/equipos/:id" element={<Ficha />} />
         </Routes>
       </div>
     </BrowserRouter>

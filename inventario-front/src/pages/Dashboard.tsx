@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDestino from '../components/ModalNuevoDestino';
-import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, ArrowLeft, Monitor } from 'lucide-react';
 
 interface Destino {
   id_destino: number;
@@ -103,6 +103,12 @@ export default function Dashboard() {
           </div>
 
           <div className="flex gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => navigate('/dashboard/equipos')}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
+            >
+              <Monitor className="w-4 h-4" /> Ver Equipos
+            </button>
             <button
               onClick={() => navigate('/dashboard/auxiliares')}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"

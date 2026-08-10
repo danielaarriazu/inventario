@@ -217,8 +217,8 @@ export const generarQrEquipo = async (id_planilla: number) => {
     throw new Error('Equipo no encontrado');
   }
 
-  // Por ahora ponemos una URL de ejemplo, cuando tengas tu frontend la cambiamos.
-  const urlDestino = `https://inventario-armada.com/equipos/ficha/${id_planilla}`;
+  const frontendUrl = (process.env.FRONTEND_URL || 'https://inventario-wju6.onrender.com').replace(/\/$/, '');
+  const urlDestino = `${frontendUrl}/equipos/${id_planilla}`;
 
   const qrBase64 = await QRCode.toDataURL(urlDestino, {
     margin: 1,

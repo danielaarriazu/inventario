@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegistroCargo() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function RegistroCargo() {
     mr: '',
     password: ''
   });
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
@@ -71,11 +73,20 @@ export default function RegistroCargo() {
           className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
         />
 
-        <input
-          type="password" name="password" placeholder="Contraseña de acceso"
-          value={formData.password} onChange={handleChange} required
-          className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
-        />
+        <div className="relative">
+          <input
+            type={mostrarPassword ? 'text' : 'password'} name="password" placeholder="Contraseña de acceso"
+            value={formData.password} onChange={handleChange} required
+            className="w-full p-2.5 pr-10 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
+          />
+          <button
+            type="button"
+            onClick={() => setMostrarPassword(!mostrarPassword)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-texto-sec hover:text-primario cursor-pointer"
+          >
+            {mostrarPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
 
         <button type="submit" className="w-full bg-primario text-white font-bold p-3 rounded hover:bg-primario-hover transition-colors cursor-pointer">
           Registrar Cargo

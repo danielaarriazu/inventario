@@ -11,6 +11,8 @@ services:
         sync: false
       - key: DIRECT_URL
         sync: false
+      - key: FRONTEND_URL
+        value: https://inventario-wju6.onrender.com
 
   - type: web
     name: inventario-frontend
