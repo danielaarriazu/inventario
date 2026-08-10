@@ -14,7 +14,7 @@ export default function LoginForm() {
     try {
       const response = await api.post('/auth/login', { mr, password });
       localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      navigate('/menu');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Matrícula o contraseña incorrecta');
     }

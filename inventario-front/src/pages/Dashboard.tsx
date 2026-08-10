@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDestino from '../components/ModalNuevoDestino';
-import { Shield, PlusCircle, Users, LogOut, LayoutDashboard } from 'lucide-react';
+import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, ArrowLeft } from 'lucide-react';
 
 interface Destino {
   id_destino: number;
@@ -59,6 +59,12 @@ export default function Dashboard() {
       {/* Navbar */}
       <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/menu')}
+            className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <div className="bg-white/10 p-2 rounded-lg">
             <Shield className="w-6 h-6 text-white" />
           </div>

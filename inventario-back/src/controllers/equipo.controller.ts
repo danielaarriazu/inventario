@@ -88,3 +88,33 @@ export const getEquipoQR = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al generar el código QR' });
   }
 };
+
+// POST /api/equipos/:id/movimiento -> usado desde la pantalla de Movimientos
+export const registrarMovimiento = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id_planilla = parseInt(req.params.id as string, 10);
+    if (isNaN(id_planilla)) {
+      res.status(400).json({ error: 'El ID proporcionado no es válido' });
+      return;
+    }
+
+    const { tipo_accion, id_oficina_destino, observaciones } = req.body;
+    const id_usuario = req.usuario!.id_usuario;
+
+    if (!tipo_accion) {
+      res.status(400).json({ error: 'El tipo de acción es obligatorio' });
+      return;
+    }
+
+    const resultado = await equipoService.registrarMovimiento(
+      id_planilla,
+      tipo_accion,
+      id_usuario,
+      id_oficina_destino,
+      observaciones
+    );
+    res.status(201).json(resultado);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Error al registrar el movimiento' });
+  }
+};

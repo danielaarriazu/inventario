@@ -137,6 +137,75 @@ export const bajaLogicaEquipo = async (id_planilla: number, id_usuario?: number)
 
   return resultado;
 };
+const ETIQUETAS_TIPO_ACCION: Record<string, string> = {
+  TRASPASO: 'Traspaso de equipo',
+  MANTENIMIENTO_PREVENTIVO: 'Mantenimiento preventivo',
+  REPARACION: 'Reparación',
+  BAJA_DEFINITIVA: 'Baja definitiva'
+};
+
+// Usado desde la pantalla de Movimientos: además de dejar el registro en el
+// historial, actualiza el propio equipo cuando el tipo de acción lo requiere
+// (Traspaso mueve la oficina real, Baja Definitiva marca el estado)
+export const registrarMovimiento = async (
+  id_planilla: number,
+  tipo_accion: string,
+  id_usuario: number,
+  id_oficina_destino?: number,
+  observaciones?: string
+) => {
+  const equipoViejo = await prisma.planilla_Equipo.findUnique({
+    where: { id_planilla }
+  });
+
+  if (!equipoViejo) {
+    throw new Error('Equipo no encontrado');
+  }
+
+  if (!ETIQUETAS_TIPO_ACCION[tipo_accion]) {
+    throw new Error('Tipo de acción no válido');
+  }
+
+  if (tipo_accion === 'TRASPASO' && !id_oficina_destino) {
+    throw new Error('El traspaso requiere una oficina destino');
+  }
+
+  const dataEquipo: any = {};
+  const detalleCambios: any = {};
+
+  if (tipo_accion === 'TRASPASO') {
+    dataEquipo.id_oficina = id_oficina_destino;
+    detalleCambios.id_oficina = { antes: equipoViejo.id_oficina, despues: id_oficina_destino };
+  } else if (tipo_accion === 'BAJA_DEFINITIVA') {
+    dataEquipo.estado_equipo = 'BAJA';
+    detalleCambios.estado_equipo = { antes: equipoViejo.estado_equipo, despues: 'BAJA' };
+  }
+  // REPARACION y MANTENIMIENTO_PREVENTIVO no modifican el equipo en sí,
+  // solo quedan registrados en el historial
+
+  const resultado = await prisma.$transaction(async (tx) => {
+    const equipoActualizado = Object.keys(dataEquipo).length > 0
+      ? await tx.planilla_Equipo.update({ where: { id_planilla }, data: dataEquipo })
+      : equipoViejo;
+
+    const historial = await tx.historial_Modificacion.create({
+      data: {
+        id_planilla,
+        id_usuario,
+        tipo_accion: tipo_accion as any,
+        id_oficina_destino: tipo_accion === 'TRASPASO' ? id_oficina_destino : undefined,
+        observaciones,
+        motivo_cambio: ETIQUETAS_TIPO_ACCION[tipo_accion],
+        detalle_cambios: JSON.stringify(detalleCambios)
+      }
+    });
+
+    return { equipo: equipoActualizado, historial };
+  });
+
+  return resultado;
+};
+
 export const generarQrEquipo = async (id_planilla: number) => {
   // Primero verificamos que la PC exista
   const equipo = await prisma.planilla_Equipo.findUnique({
