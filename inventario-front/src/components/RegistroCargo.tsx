@@ -40,7 +40,7 @@ export default function RegistroCargo() {
         
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-blue-900">Alta de Nuevo Cargo</h2>
-          <p className="text-sm text-gray-500 mt-1">Configure la jurisdicción y el responsable</p>
+          <p className="text-sm text-gray-500 mt-1">Configure el cargo y el responsable</p>
         </div>
 
         {mensaje && <div className="p-3 bg-green-100 text-green-800 rounded text-sm text-center font-semibold">{mensaje}</div>}

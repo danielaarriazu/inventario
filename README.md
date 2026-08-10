@@ -1,10 +1,10 @@
 # Sistema de Inventario 
 
-Sistema web Multi-Tenant diseñado para la gestión integral, trazabilidad y auditoría de activos informáticos. Permite administrar la estructura orgánica (Cargos, Destinos, Departamentos y Divisiones) garantizando el aislamiento total de los datos según la jurisdicción del usuario responsable.
+Sistema web Multi-Tenant diseñado para la gestión integral, trazabilidad y auditoría de activos informáticos. Permite administrar la estructura orgánica (Cargos, Destinos, Departamentos y Divisiones) garantizando el aislamiento total de los datos según el cargo del usuario responsable.
 
 ## 🚀 Características Principales
 
-* **Arquitectura Multi-Tenant:** Aislamiento de datos por "Cargo" mediante tokens JWT. Un usuario solo tiene acceso al patrimonio de su propia jurisdicción.
+* **Arquitectura Multi-Tenant:** Aislamiento de datos por "Cargo" mediante tokens JWT. Un usuario solo tiene acceso al patrimonio de su propio cargo / destino.
 * **Gestión Jerárquica:** Administración de Destinos, Departamentos y Divisiones.
 * **Trazabilidad y Auditoría:** Registro automático (hoja de vida) de cualquier modificación de hardware o reasignación de equipos.
 * **Generación de Etiquetas QR:** Creación automática de códigos QR en Base64 para el etiquetado físico de los activos.

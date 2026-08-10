@@ -71,7 +71,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-xl">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              <LayoutDashboard className="text-lime-400 w-6 h-6" /> Destinos de la Jurisdicción
+              <LayoutDashboard className="text-lime-400 w-6 h-6" /> Destinos de la ión
             </h2>
             <p className="text-sm text-slate-400 mt-1">Consola de administración y despliegue de infraestructura.</p>
           </div>
@@ -98,7 +98,7 @@ export default function Dashboard() {
             <div className="col-span-full bg-slate-900/50 p-10 rounded-xl border-2 border-dashed border-slate-800 text-center shadow-inner">
               <div className="w-12 h-12 bg-slate-950 text-slate-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-800">🔬</div>
               <p className="text-slate-400 font-medium font-mono text-sm">
-                NO SE DETECTAN REGISTROS EN ESTA JURISDICCIÓN.
+                NO SE DETECTAN REGISTROS EN ESTE CARGO.
               </p>
               <p className="text-xs text-slate-600 mt-1">Use el comando de inicialización "Nuevo Destino" para comenzar.</p>
             </div>

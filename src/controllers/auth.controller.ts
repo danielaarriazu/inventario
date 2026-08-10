@@ -37,8 +37,8 @@ export const login = async (req: Request, res: Response) => {
 export const registrarAuxiliar = async (req: Request, res: Response): Promise<void> => {
   try {
     const { mr, nombre, rol, jerarquia } = req.body;
-    // req.user viene del authMiddleware con los datos descifrados del JWT
-    const id_cargo = (req as any).user.id_cargo; 
+    // req.usuario viene del middleware verificarToken con los datos descifrados del JWT
+    const id_cargo = req.usuario!.id_cargo;
 
     if (!mr || !nombre || !rol) {
       res.status(400).json({ error: 'Todos los campos son obligatorios' });
@@ -63,7 +63,7 @@ export const registrarAuxiliar = async (req: Request, res: Response): Promise<vo
         password: passwordHasheada,
         rol, // OPERADOR, AUDITOR, ENCARGADO, etc.
         jerarquia,
-        id_cargo // Se vincula automáticamente a tu misma jurisdicción
+        id_cargo // Se vincula automáticamente a tu mismo cargo
       }
     });
 
@@ -76,9 +76,9 @@ export const registrarAuxiliar = async (req: Request, res: Response): Promise<vo
 
 export const obtenerAuxiliares = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id_cargo = (req as any).user.id_cargo;
+    const id_cargo = req.usuario!.id_cargo;
 
-    // Buscamos todos los usuarios que pertenezcan al mismo Cargo/Jurisdicción
+    // Buscamos todos los usuarios que pertenezcan al mismo Cargo
     const auxiliares = await prisma.usuario.findMany({
       where: {
         id_cargo: id_cargo
@@ -86,7 +86,7 @@ export const obtenerAuxiliares = async (req: Request, res: Response): Promise<vo
       select: {
         id_usuario: true,
         mr: true,
-        nombre: true,
+        nombre_apellido: true,
         rol: true
       }
     });
@@ -95,5 +95,34 @@ export const obtenerAuxiliares = async (req: Request, res: Response): Promise<vo
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error interno al obtener el equipo' });
+  }
+};
+
+// GET /api/auth/me -> Datos del usuario logueado
+export const obtenerPerfil = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id_usuario = req.usuario!.id_usuario;
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { id_usuario },
+      select: {
+        id_usuario: true,
+        mr: true,
+        nombre_apellido: true,
+        jerarquia: true,
+        rol: true,
+        id_cargo: true
+      }
+    });
+
+    if (!usuario) {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+      return;
+    }
+
+    res.json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno al obtener el perfil' });
   }
 };
