@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import api from '../services/api';
+import { X, Terminal, UserPlus } from 'lucide-react';
 
-interface ModalNuevoAuxiliarProps {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuxiliarCreado: () => void;
 }
 
-export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }: ModalNuevoAuxiliarProps) {
+export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }: ModalProps) {
   const [mr, setMr] = useState('');
   const [nombre, setNombre] = useState('');
-  const [rol, setRol] = useState('OPERADOR'); 
+  const [rol, setRol] = useState('OPERADOR');
   const [errorForm, setErrorForm] = useState('');
 
   if (!isOpen) return null;
@@ -18,91 +19,91 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
   const handleCreateAuxiliar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorForm('');
-
-    if (!mr || !nombre) {
-      setErrorForm('Todos los campos son obligatorios');
-      return;
-    }
-
     try {
+      // Envía los datos mapeados al endpoint correcto del backend
       await api.post('/auth/companeros', {
         mr,
-        nombre,
+        nombre, // El backend se encargará de guardarlo en nombre_apellido
         rol
       });
 
+      // Limpiamos el formulario
       setMr('');
       setNombre('');
       setRol('OPERADOR');
-      onAuxiliarCreado(); 
-      onClose(); 
+      onAuxiliarCreado(); // Recarga la grilla de la pantalla
+      onClose(); // Cierra el modal
     } catch (error: any) {
-      setErrorForm(error.response?.data?.error || 'Error al registrar al auxiliar');
+      setErrorForm(error.response?.data?.error || 'Error en los servidores de base de datos.');
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 m-4 animate-in fade-in zoom-in-95 duration-150">
-        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>🎖️</span> Registrar Auxiliar de Equipo
-        </h3>
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      {/* Caja del Modal */}
+      <div className="bg-slate-900 border-2 border-cyan-500/40 rounded-xl max-w-md w-full shadow-[0_0_50px_rgba(6,182,212,0.25)] overflow-hidden transform transition-all">
         
-        <form onSubmit={handleCreateAuxiliar} className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Matrícula (MR)</label>
-            <input 
-              type="text"
-              placeholder="Ej: 123456"
-              value={mr}
-              onChange={(e) => setMr(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        {/* Encabezado del Modal */}
+        <div className="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
+          <div className="flex items-center gap-2 font-mono text-xs text-cyan-400">
+            <Terminal className="w-4 h-4" />
+            <span>CMD: REGISTER_NEW_USER</span>
           </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors cursor-pointer">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Nombre y Apellido Completo</label>
-            <input 
-              type="text"
-              placeholder="Ej: Juan Pérez"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Rol en el Sistema</label>
-            <select
-              value={rol}
-              onChange={(e) => setRol(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="OPERADOR">Operador (Solo Carga de Inventario)</option>
-              <option value="AUDITOR">Auditor (Verificación y Reportes)</option>
-              <option value="ENCARGADO">Encargado de Destino</option>
-            </select>
+        {/* Formulario */}
+        <form onSubmit={handleCreateAuxiliar} className="p-6 space-y-4">
+          <div className="text-center mb-2">
+            <div className="w-10 h-10 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-2 border border-cyan-500/30">
+              <UserPlus className="w-5 h-5 text-cyan-400" />
+            </div>
+            <h3 className="text-lg font-black text-white uppercase tracking-wide">Alta de Auxiliar</h3>
           </div>
 
           {errorForm && (
-            <p className="text-red-600 text-sm font-medium bg-red-50 p-2 rounded">{errorForm}</p>
+            <div className="bg-red-950/40 border border-red-500/40 text-red-400 p-2.5 rounded text-xs font-mono">
+              ⚠️ ERROR_SYSTEM: {errorForm}
+            </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-2">
-            <button 
-              type="button"
-              onClick={() => { onClose(); setErrorForm(''); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button 
-              type="submit"
-              className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg hover:bg-blue-800 transition-colors shadow cursor-pointer"
-            >
-              Dar de Alta
-            </button>
+          <div className="space-y-1">
+            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Matrícula de Revista (M.R.)</label>
+            <input 
+              type="text" required placeholder="Ej: 234567" value={mr}
+              onChange={(e) => setMr(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 font-mono text-sm text-lime-400 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
           </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Nombre Completo</label>
+            <input 
+              type="text" required placeholder="Ej: Juan Pérez" value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Rol Operacional en Sistema</label>
+            <select 
+              value={rol} onChange={(e) => setRol(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 font-mono text-sm text-cyan-400 focus:outline-none focus:border-cyan-500 transition-colors cursor-pointer"
+            >
+              <option value="OPERADOR">OPERADOR (Carga de datos)</option>
+              <option value="AUDITOR">AUDITOR (Solo Lectura/Informes)</option>
+            </select>
+          </div>
+
+          <button 
+            type="submit" 
+            className="w-full mt-2 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-black p-3 rounded-lg shadow-lg shadow-cyan-500/20 transition-all duration-200 cursor-pointer uppercase tracking-wider text-sm"
+          >
+            Inyectar en Base de Datos
+          </button>
         </form>
       </div>
     </div>
