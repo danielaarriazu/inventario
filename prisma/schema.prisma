@@ -6,10 +6,17 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+
 }
 
 // --- ENUMS (Opciones cerradas) ---
 enum EstadoDestino {
+  ALTA
+  BAJA
+}
+
+enum EstadoOficina {
   ALTA
   BAJA
 }
@@ -45,10 +52,18 @@ enum EstadoEquipo {
   REPARACION
 }
 
+enum TipoAccion {
+  TRASPASO
+  MANTENIMIENTO_PREVENTIVO
+  REPARACION
+  BAJA_DEFINITIVA
+}
+
 enum RolUsuario {
   RESPONSABLE    
   SUBORDINADO  
 }
+
 model Cargo {
   id_cargo     Int       @id @default(autoincrement())
   nombre_cargo String    
@@ -105,7 +120,19 @@ model Division {
   id_departamento Int
   estado              EstadoDestino   @default(ALTA)
   departamento    Departamento      @relation(fields: [id_departamento], references: [id_departamento])
-  equipos         Planilla_Equipo[]
+  oficina          Oficina[]
+}
+
+model Oficina {
+  id_oficina     Int           @id @default(autoincrement())
+  numero_oficina String
+  estado         EstadoOficina @default(ALTA)
+
+  id_division    Int
+  division       Division      @relation(fields: [id_division], references: [id_division])
+
+  equipos             Planilla_Equipo[]
+  movimientosDestino  Historial_Modificacion[]
 }
 
 // --- TABLA PRINCIPAL ---
@@ -115,8 +142,8 @@ model Planilla_Equipo {
   correlativo_dominio Int
   
   // Ubicación y Responsabilidad
-  id_division         Int
-  division            Division  @relation(fields: [id_division], references: [id_division])
+  id_oficina         Int
+  oficina            Oficina  @relation(fields: [id_oficina], references: [id_oficina])
   numero_oficina      String    // Ubicación física actual
   usuario_responsable String
   
@@ -160,6 +187,11 @@ model Historial_Modificacion {
   
   id_usuario         Int?
   usuario            Usuario?        @relation(fields: [id_usuario], references: [id_usuario])
+
+  tipo_accion       TipoAccion?
+  id_oficina_destino   Int?
+  oficina_destino     Oficina?        @relation(fields: [id_oficina_destino], references: [id_oficina])
+  observaciones       String?
 
   fecha_modificacion DateTime        @default(now())
   motivo_cambio      String
