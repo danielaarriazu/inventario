@@ -5,19 +5,25 @@ export const obtenerEquipos = async (id_cargo: number) => {
   return await prisma.planilla_Equipo.findMany({
     where: {
       // Magia de Prisma: Buscamos solo los equipos cuyo destino pertenezca a este cargo
-      division: {
-        departamento: {
-          destino: {
-            id_cargo: id_cargo
+      oficina: {
+        division: {
+          departamento: {
+            destino: {
+              id_cargo: id_cargo
+            }
           }
         }
       }
     },
     include: {
-      division: {
+      oficina: {
         include: {
-          departamento: {
-            include: { destino: true }
+          division: {
+            include: {
+              departamento: {
+                include: { destino: true }
+              }
+            }
           }
         }
       }
@@ -28,10 +34,14 @@ export const obtenerEquipoPorId = async (id_planilla: number) => {
   return await prisma.planilla_Equipo.findUnique({
     where: { id_planilla },
     include: {
-      division: {
+      oficina: {
         include: {
-          departamento: {
-            include: { destino: true }
+          division: {
+            include: {
+              departamento: {
+                include: { destino: true }
+              }
+            }
           }
         }
       }
@@ -48,7 +58,7 @@ export const crearEquipo = async (data: any) => {
 export const actualizarEquipo = async (
   id_planilla: number, 
   data: any, 
-  usuario_modificador: string = "Sistema" // En el futuro acá vendrá el usuario logueado
+  id_usuario?: number // Usuario autenticado que hace el cambio (viene del token)
 ) => {
   const equipoViejo = await prisma.planilla_Equipo.findUnique({
     where: { id_planilla }
@@ -82,7 +92,8 @@ export const actualizarEquipo = async (
     await tx.historial_Modificacion.create({
       data: {
         id_planilla,
-        motivo_cambio: `Actualización de datos por ${usuario_modificador}`,
+        id_usuario,
+        motivo_cambio: 'Actualización de datos',
         detalle_cambios: JSON.stringify(cambiosRealizados)
       }
     });
@@ -93,11 +104,38 @@ export const actualizarEquipo = async (
   return resultado;
 };
 
-export const bajaLogicaEquipo = async (id_planilla: number) => {
-  return await prisma.planilla_Equipo.update({
+export const bajaLogicaEquipo = async (id_planilla: number, id_usuario?: number) => {
+  const equipoViejo = await prisma.planilla_Equipo.findUnique({
     where: { id_planilla },
-    data: { estado_equipo: 'BAJA' }
+    select: { estado_equipo: true }
   });
+
+  if (!equipoViejo) {
+    throw new Error('Equipo no encontrado');
+  }
+
+  const resultado = await prisma.$transaction(async (tx) => {
+    const equipoDeBaja = await tx.planilla_Equipo.update({
+      where: { id_planilla },
+      data: { estado_equipo: 'BAJA' }
+    });
+
+    await tx.historial_Modificacion.create({
+      data: {
+        id_planilla,
+        id_usuario,
+        tipo_accion: 'BAJA_DEFINITIVA',
+        motivo_cambio: 'Baja definitiva del equipo',
+        detalle_cambios: JSON.stringify({
+          estado_equipo: { antes: equipoViejo.estado_equipo, despues: 'BAJA' }
+        })
+      }
+    });
+
+    return equipoDeBaja;
+  });
+
+  return resultado;
 };
 export const generarQrEquipo = async (id_planilla: number) => {
   // Primero verificamos que la PC exista
