@@ -72,7 +72,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-white tracking-wide">
-              Sistema de Inventario Patrimonial
+              Sistema de Inventario
             </h1>
           </div>
         </div>

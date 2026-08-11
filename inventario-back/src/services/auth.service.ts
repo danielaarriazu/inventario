@@ -86,3 +86,26 @@ export const iniciarSesion = async (mr: string, password_plana: string) => {
     } 
   };
 };
+
+// 3. Cambiar mi propia contraseña (sabiendo la actual)
+export const cambiarPassword = async (id_usuario: number, passwordActual: string, passwordNueva: string) => {
+  const usuario = await prisma.usuario.findUnique({ where: { id_usuario } });
+  if (!usuario) throw new Error('Usuario no encontrado');
+
+  const passwordValida = await bcrypt.compare(passwordActual, usuario.password);
+  if (!passwordValida) throw new Error('La contraseña actual no es correcta');
+
+  const nuevoHash = await bcrypt.hash(passwordNueva, 10);
+  await prisma.usuario.update({ where: { id_usuario }, data: { password: nuevoHash } });
+};
+
+// 4. El Responsable resetea la contraseña de un auxiliar de su mismo cargo
+// (para cuando se la olvida — acá no hay mail para recuperarla sola)
+export const resetearPasswordAuxiliar = async (id_usuario_objetivo: number, id_cargo_responsable: number, passwordNueva: string) => {
+  const usuario = await prisma.usuario.findUnique({ where: { id_usuario: id_usuario_objetivo } });
+  if (!usuario) throw new Error('Auxiliar no encontrado');
+  if (usuario.id_cargo !== id_cargo_responsable) throw new Error('No tenés permiso sobre este usuario');
+
+  const nuevoHash = await bcrypt.hash(passwordNueva, 10);
+  await prisma.usuario.update({ where: { id_usuario: id_usuario_objetivo }, data: { password: nuevoHash } });
+};

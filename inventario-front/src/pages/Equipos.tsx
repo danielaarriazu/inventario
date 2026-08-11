@@ -100,7 +100,7 @@ export default function Equipos() {
           <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
             <MenuIcon className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario Patrimonial</h1>
+          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario</h1>
         </div>
       </nav>
 
@@ -145,7 +145,7 @@ export default function Equipos() {
           <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por N° de patrimonio, nombre de PC o responsable..."
+            placeholder="Buscar por N° de equipo, nombre de PC o responsable..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento"

@@ -52,7 +52,7 @@ export default function ModalNuevaDivision({ isOpen, onClose, onDivisionCreada, 
             <label className="block text-sm font-semibold text-texto-sec mb-1">Nombre de la División</label>
             <input
               type="text"
-              placeholder="Ej: Contrataciones"
+              placeholder="Ej: Contaduria"
               value={nombreDivision}
               onChange={(e) => setNombreDivision(e.target.value)}
               className="w-full px-3 py-2 border border-borde rounded-lg focus:outline-none focus:ring-2 focus:ring-acento text-tinta"
@@ -63,7 +63,7 @@ export default function ModalNuevaDivision({ isOpen, onClose, onDivisionCreada, 
             <label className="block text-sm font-semibold text-texto-sec mb-1">Abreviatura</label>
             <input
               type="text"
-              placeholder="Ej: CONTR"
+              placeholder="Ej: CO"
               value={abreviatura}
               onChange={(e) => setAbreviatura(e.target.value)}
               className="w-full px-3 py-2 border border-borde rounded-lg focus:outline-none focus:ring-2 focus:ring-acento text-tinta"

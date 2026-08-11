@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoAuxiliar from '../components/ModalNuevoAuxiliar';
-import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert } from 'lucide-react';
+import ModalResetearPassword from '../components/ModalResetearPassword';
 import Sidebar from '../components/Sidebar';
+import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert, KeyRound } from 'lucide-react';
 
 interface Auxiliar {
   id_usuario: number;
@@ -12,10 +13,14 @@ interface Auxiliar {
   rol: string;
 }
 
+interface Perfil { rol: string; }
+
 export default function Auxiliares() {
   const [auxiliares, setAuxiliares] = useState<Auxiliar[]>([]);
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [resetObjetivo, setResetObjetivo] = useState<Auxiliar | null>(null);
   const navigate = useNavigate();
 
   const fetchAuxiliares = async () => {
@@ -31,9 +36,21 @@ export default function Auxiliares() {
     }
   };
 
+  const fetchPerfil = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      setPerfil(response.data);
+    } catch (error) {
+      console.error('Error al obtener el perfil', error);
+    }
+  };
+
   useEffect(() => {
     fetchAuxiliares();
+    fetchPerfil();
   }, []);
+
+  const esResponsable = perfil?.rol === 'RESPONSABLE';
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
@@ -88,6 +105,7 @@ export default function Auxiliares() {
                     <th className="p-4 font-bold">M.R.</th>
                     <th className="p-4 font-bold">Nombre y Apellido</th>
                     <th className="p-4 font-bold">Rol</th>
+                    {esResponsable && <th className="p-4"></th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-borde">
@@ -108,6 +126,16 @@ export default function Auxiliares() {
                           {aux.rol}
                         </span>
                       </td>
+                      {esResponsable && (
+                        <td className="p-4">
+                          <button
+                            onClick={() => setResetObjetivo(aux)}
+                            className="flex items-center gap-1.5 text-acento hover:underline text-xs font-bold cursor-pointer"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" /> Resetear contraseña
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -121,6 +149,13 @@ export default function Auxiliares() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAuxiliarCreado={fetchAuxiliares}
+      />
+
+      <ModalResetearPassword
+        isOpen={!!resetObjetivo}
+        onClose={() => setResetObjetivo(null)}
+        idUsuario={resetObjetivo?.id_usuario ?? null}
+        nombreUsuario={resetObjetivo?.nombre_apellido}
       />
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />

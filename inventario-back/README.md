@@ -4,7 +4,7 @@ Sistema web Multi-Tenant diseñado para la gestión integral, trazabilidad y aud
 
 ## 🚀 Características Principales
 
-* **Arquitectura Multi-Tenant:** Aislamiento de datos por "Cargo" mediante tokens JWT. Un usuario solo tiene acceso al patrimonio de su propio cargo / destino.
+* **Arquitectura Multi-Tenant:** Aislamiento de datos por "Cargo" mediante tokens JWT. Un usuario solo tiene acceso al inventario de su propio cargo / destino.
 * **Gestión Jerárquica:** Administración de Destinos, Departamentos y Divisiones.
 * **Trazabilidad y Auditoría:** Registro automático (hoja de vida) de cualquier modificación de hardware o reasignación de equipos.
 * **Generación de Etiquetas QR:** Creación automática de códigos QR en Base64 para el etiquetado físico de los activos.

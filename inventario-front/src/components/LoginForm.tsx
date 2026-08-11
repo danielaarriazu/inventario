@@ -27,7 +27,7 @@ export default function LoginForm() {
       <form onSubmit={handleLogin} className="space-y-4 p-8 bg-superficie rounded-xl shadow-lg w-96 border border-borde">
         <div className="text-center mb-6">
           <div className="text-2xl mb-1">⚓</div>
-          <h2 className="text-xl font-bold text-primario">Sistema de Inventario Patrimonial</h2>
+          <h2 className="text-xl font-bold text-primario">Sistema de Inventario</h2>
         </div>
 
         {error && (

@@ -124,3 +124,46 @@ export const obtenerPerfil = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ error: 'Error interno al obtener el perfil' });
   }
 };
+
+// PUT /api/auth/me/password -> cambio mi propia contraseña (sabiendo la actual)
+export const cambiarPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { password_actual, password_nueva } = req.body;
+
+    if (!password_actual || !password_nueva) {
+      res.status(400).json({ error: 'Completá la contraseña actual y la nueva' });
+      return;
+    }
+    if (password_nueva.length < 4) {
+      res.status(400).json({ error: 'La contraseña nueva es demasiado corta' });
+      return;
+    }
+
+    await authService.cambiarPassword(req.usuario!.id_usuario, password_actual, password_nueva);
+    res.status(200).json({ mensaje: 'Contraseña actualizada correctamente' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Error al cambiar la contraseña' });
+  }
+};
+
+// PUT /api/auth/companeros/:id/password -> el Responsable resetea la contraseña de un auxiliar
+export const resetearPasswordAuxiliar = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idObjetivo = parseInt(req.params.id as string, 10);
+    const { password_nueva } = req.body;
+
+    if (isNaN(idObjetivo)) {
+      res.status(400).json({ error: 'El ID proporcionado no es válido' });
+      return;
+    }
+    if (!password_nueva) {
+      res.status(400).json({ error: 'Ingresá la nueva contraseña' });
+      return;
+    }
+
+    await authService.resetearPasswordAuxiliar(idObjetivo, req.usuario!.id_cargo, password_nueva);
+    res.status(200).json({ mensaje: 'Contraseña reseteada correctamente' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Error al resetear la contraseña' });
+  }
+};

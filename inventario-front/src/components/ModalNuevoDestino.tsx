@@ -50,7 +50,7 @@ export default function ModalNuevoDestino({ isOpen, onClose, onDestinoCreado }: 
             <label className="block text-sm font-semibold text-texto-sec mb-1">Nombre del Destino</label>
             <input
               type="text"
-              placeholder="Ej: Dirección de Informática"
+              placeholder="Ej: Dirección de Prsonal"
               value={nombreDestino}
               onChange={(e) => setNombreDestino(e.target.value)}
               className="w-full px-3 py-2 border border-borde rounded-lg focus:outline-none focus:ring-2 focus:ring-acento text-tinta"
@@ -61,7 +61,7 @@ export default function ModalNuevoDestino({ isOpen, onClose, onDestinoCreado }: 
             <label className="block text-sm font-semibold text-texto-sec mb-1">Código de Destino (Número)</label>
             <input
               type="number"
-              placeholder="Ej: 1042"
+              placeholder="Ej: 142"
               value={codDestino}
               onChange={(e) => setCodDestino(e.target.value)}
               className="w-full px-3 py-2 border border-borde rounded-lg focus:outline-none focus:ring-2 focus:ring-acento text-tinta"

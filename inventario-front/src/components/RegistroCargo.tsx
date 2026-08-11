@@ -49,7 +49,7 @@ export default function RegistroCargo() {
         {error && <div className="p-3 bg-baja/10 text-baja border border-baja/30 rounded text-sm text-center font-semibold">{error}</div>}
 
         <input
-          type="text" name="nombre_cargo" placeholder="Nombre del Cargo (Ej: Informática Central)"
+          type="text" name="nombre_cargo" placeholder="Nombre del Cargo (Ej: Informática)"
           value={formData.nombre_cargo} onChange={handleChange} required
           className="w-full p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
         />

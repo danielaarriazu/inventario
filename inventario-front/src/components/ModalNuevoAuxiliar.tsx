@@ -61,7 +61,7 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
           <div className="space-y-1">
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Matrícula (M.R.)</label>
             <input
-              type="text" required placeholder="Ej: 4108" value={mr}
+              type="text" required placeholder="Ej: 4226546" value={mr}
               onChange={(e) => setMr(e.target.value)}
               className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
             />
@@ -70,7 +70,7 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
           <div className="space-y-1">
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Nombre Completo</label>
             <input
-              type="text" required placeholder="Ej: ST Gómez" value={nombre}
+              type="text" required placeholder="Ej: SOSA, Juan" value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
             />
@@ -79,7 +79,7 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
           <div className="space-y-1">
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Jerarquía</label>
             <input
-              type="text" required placeholder="Ej: Suboficial Técnico" value={jerarquia}
+              type="text" required placeholder="Ej: CPIN" value={jerarquia}
               onChange={(e) => setJerarquia(e.target.value)}
               className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
             />

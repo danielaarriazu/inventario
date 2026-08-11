@@ -469,7 +469,7 @@ export default function Movimientos() {
 
                   <div>
                     <label className={labelClass}>Otros periféricos</label>
-                    <CampoMultilinea valores={perifericosOtros} onChange={setPerifericosOtros} placeholder="Ej: parlantes externos" />
+                    <CampoMultilinea valores={perifericosOtros} onChange={setPerifericosOtros} placeholder="Ej: HUB USB 5 puertos" />
                   </div>
                 </div>
               )}

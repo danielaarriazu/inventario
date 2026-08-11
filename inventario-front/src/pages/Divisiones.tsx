@@ -47,7 +47,7 @@ export default function Divisiones() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-bold text-white tracking-wide">
-            Sistema de Inventario Patrimonial
+            Sistema de Inventario
           </h1>
         </div>
       </nav>

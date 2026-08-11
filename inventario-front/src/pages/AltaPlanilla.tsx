@@ -149,7 +149,7 @@ export default function AltaPlanilla() {
               </div>
               <div>
                 <label className={labelClass}>Usuario Responsable</label>
-                <input value={form.usuario_responsable} onChange={e => setCampo('usuario_responsable', e.target.value)} placeholder="Ej: TF López" className={inputClass} />
+                <input value={form.usuario_responsable} onChange={e => setCampo('usuario_responsable', e.target.value)} placeholder="Ej: TF GOMEZ" className={inputClass} />
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function AltaPlanilla() {
             </div>
             <div className="mb-3">
               <label className={labelClass}>Usuario de Red</label>
-              <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.CONTRATACION" className={inputClass} />
+              <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.INFORMATICA" className={inputClass} />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>

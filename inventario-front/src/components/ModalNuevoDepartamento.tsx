@@ -63,7 +63,7 @@ export default function ModalNuevoDepartamento({ isOpen, onClose, onDepartamento
             <label className="block text-sm font-semibold text-texto-sec mb-1">Abreviatura</label>
             <input
               type="text"
-              placeholder="Ej: INFO"
+              placeholder="Ej: IN"
               value={abreviatura}
               onChange={(e) => setAbreviatura(e.target.value)}
               className="w-full px-3 py-2 border border-borde rounded-lg focus:outline-none focus:ring-2 focus:ring-acento text-tinta"

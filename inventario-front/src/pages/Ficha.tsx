@@ -353,7 +353,7 @@ export default function Ficha() {
                 onClick={handleDescargarQR}
                 className="w-full mt-3 flex items-center justify-center gap-2 bg-champagne hover:brightness-95 text-primario font-bold text-sm py-2.5 rounded-lg transition-all cursor-pointer"
               >
-                <Download className="w-4 h-4" /> Descargar QR (x2 — CPU y Monitor)
+                <Download className="w-4 h-4" /> Descargar QR 
               </button>
             </div>
           </div>

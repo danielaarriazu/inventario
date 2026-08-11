@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut } from 'lucide-react';
+import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut, KeyRound } from 'lucide-react';
+import ModalCambiarPassword from './ModalCambiarPassword';
 
 interface SidebarProps {
   open: boolean;
@@ -19,6 +21,7 @@ const ITEMS = [
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -69,6 +72,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               </button>
             );
           })}
+
+          <div className="pt-2 mt-2 border-t border-borde">
+            <button
+              onClick={() => setPasswordModalOpen(true)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-tinta hover:bg-fondo transition-colors cursor-pointer"
+            >
+              <KeyRound className="w-4 h-4" />
+              Cambiar mi contraseña
+            </button>
+          </div>
         </nav>
 
         <div className="p-3 border-t border-borde flex-shrink-0">
@@ -81,6 +94,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
       </aside>
+
+      <ModalCambiarPassword isOpen={passwordModalOpen} onClose={() => setPasswordModalOpen(false)} />
     </>
   );
 }
