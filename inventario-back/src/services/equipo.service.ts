@@ -97,6 +97,11 @@ export const actualizarEquipo = async (
   data: any, 
   id_usuario?: number // Usuario autenticado que hace el cambio (viene del token)
 ) => {
+  // Estos dos campos solo pueden cambiar mediante un Traspaso (Movimientos),
+  // nunca desde una edición común de la Ficha
+  const { nombre_equipo, usuario_responsable, ...data2 } = data;
+  data = data2;
+
   const equipoViejo = await prisma.planilla_Equipo.findUnique({
     where: { id_planilla }
   });
@@ -216,6 +221,20 @@ export const registrarMovimiento = async (
   if (tipo_accion === 'TRASPASO') {
     dataEquipo.id_oficina = id_oficina_destino;
     detalleCambios.id_oficina = { antes: equipoViejo.id_oficina, despues: id_oficina_destino };
+
+    // El nombre de PC arranca con la oficina (ej: "13-71.I11") — al traspasar
+    // se regenera esa parte con la oficina nueva, conservando el sufijo de
+    // dominio+correlativo que no cambió
+    const oficinaNueva = await prisma.oficina.findUnique({ where: { id_oficina: id_oficina_destino } });
+    if (oficinaNueva) {
+      const partes = equipoViejo.nombre_equipo.split('.');
+      const sufijo = partes.length > 1 ? partes[partes.length - 1] : '';
+      const nombreNuevo = sufijo ? `${oficinaNueva.numero_oficina}.${sufijo}` : oficinaNueva.numero_oficina;
+      if (nombreNuevo !== equipoViejo.nombre_equipo) {
+        dataEquipo.nombre_equipo = nombreNuevo;
+        detalleCambios.nombre_equipo = { antes: equipoViejo.nombre_equipo, despues: nombreNuevo };
+      }
+    }
   } else if (tipo_accion === 'BAJA_DEFINITIVA') {
     dataEquipo.estado_equipo = 'BAJA';
     detalleCambios.estado_equipo = { antes: equipoViejo.estado_equipo, despues: 'BAJA' };

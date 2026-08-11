@@ -214,7 +214,15 @@ export default function Ficha() {
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 bg-superficie border border-borde rounded-xl p-5 mb-5">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold text-primario">{equipo.numero_equipo}</h2>
+              {editando ? (
+                <input
+                  value={form.numero_equipo ?? ''}
+                  onChange={e => setCampo('numero_equipo', e.target.value)}
+                  className="text-xl font-bold text-primario border border-borde rounded px-2 py-0.5 bg-superficie focus:outline-none focus:ring-2 focus:ring-acento"
+                />
+              ) : (
+                <h2 className="text-xl font-bold text-primario">{equipo.numero_equipo}</h2>
+              )}
               <span className="text-xs text-texto-sec font-semibold">({equipo.nombre_equipo})</span>
               <span className={`text-[10.5px] font-bold px-2.5 py-1 rounded-full ${ESTADO_ESTILOS[equipo.estado_equipo]}`}>{equipo.estado_equipo}</span>
             </div>
