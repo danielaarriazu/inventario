@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { ArrowLeft, Search, X, CheckCircle2 } from 'lucide-react';
+import EscanerQR from '../components/EscanerQR';
+import { ArrowLeft, Search, X, CheckCircle2, QrCode } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -28,6 +29,7 @@ export default function Movimientos() {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo | null>(null);
+  const [escaneando, setEscaneando] = useState(false);
 
   // Tipo de acción
   const [tipoAccion, setTipoAccion] = useState('');
@@ -111,6 +113,29 @@ export default function Movimientos() {
     setSelDestino(''); setSelDepartamento(''); setSelDivision(''); setSelOficina('');
   };
 
+  const handleQRDetectado = (textoLeido: string) => {
+    setEscaneando(false);
+    if (!textoLeido) {
+      setError('No se pudo acceder a la cámara o no se detectó ningún QR.');
+      return;
+    }
+    // El QR trae una URL tipo https://.../equipos/123 — nos quedamos con el ID del final
+    const match = textoLeido.match(/\/equipos\/(\d+)/);
+    const id = match ? Number(match[1]) : null;
+    if (!id) {
+      setError('El código escaneado no corresponde a un equipo de este sistema.');
+      return;
+    }
+    const encontrado = equipos.find(eq => eq.id_planilla === id);
+    if (!encontrado) {
+      setError('El equipo escaneado no se encontró en tu listado.');
+      return;
+    }
+    setError('');
+    setEquipoSeleccionado(encontrado);
+    setBusqueda('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setMensaje('');
@@ -182,30 +207,39 @@ export default function Movimientos() {
                 </button>
               </div>
             ) : (
-              <div className="relative mt-1">
-                <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="N° de patrimonio, nombre de PC o responsable"
-                  value={busqueda}
-                  onChange={(e) => setBusqueda(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-acento"
-                />
-                {resultadosBusqueda.length > 0 && (
-                  <div className="absolute z-10 mt-1 w-full bg-superficie border border-borde rounded-lg shadow-lg overflow-hidden">
-                    {resultadosBusqueda.map(eq => (
-                      <button
-                        type="button"
-                        key={eq.id_planilla}
-                        onClick={() => { setEquipoSeleccionado(eq); setBusqueda(''); }}
-                        className="w-full text-left px-3 py-2.5 hover:bg-fondo transition-colors border-b border-borde last:border-0 cursor-pointer"
-                      >
-                        <div className="font-bold text-sm text-primario">{eq.numero_equipo}</div>
-                        <div className="text-xs text-texto-sec">{eq.usuario_responsable} · Oficina {eq.oficina?.numero_oficina}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="mt-1 space-y-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="N° de patrimonio, nombre de PC o responsable"
+                    value={busqueda}
+                    onChange={(e) => setBusqueda(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-acento"
+                  />
+                  {resultadosBusqueda.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-superficie border border-borde rounded-lg shadow-lg overflow-hidden">
+                      {resultadosBusqueda.map(eq => (
+                        <button
+                          type="button"
+                          key={eq.id_planilla}
+                          onClick={() => { setEquipoSeleccionado(eq); setBusqueda(''); }}
+                          className="w-full text-left px-3 py-2.5 hover:bg-fondo transition-colors border-b border-borde last:border-0 cursor-pointer"
+                        >
+                          <div className="font-bold text-sm text-primario">{eq.numero_equipo}</div>
+                          <div className="text-xs text-texto-sec">{eq.usuario_responsable} · Oficina {eq.oficina?.numero_oficina}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEscaneando(true)}
+                  className="w-full flex items-center justify-center gap-2 bg-champagne hover:brightness-95 text-primario font-bold text-sm py-2.5 rounded-lg transition-all cursor-pointer"
+                >
+                  <QrCode className="w-4 h-4" /> Escanear QR del equipo
+                </button>
               </div>
             )}
           </div>
@@ -275,6 +309,10 @@ export default function Movimientos() {
           </button>
         </form>
       </main>
+
+      {escaneando && (
+        <EscanerQR onDetectado={handleQRDetectado} onClose={() => setEscaneando(false)} />
+      )}
     </div>
   );
 }
