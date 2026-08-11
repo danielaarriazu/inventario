@@ -39,7 +39,7 @@ export default function LoginForm() {
         <div>
           <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">M.R.</label>
           <input
-            type="text" placeholder="4021" value={mr}
+            type="text" placeholder="4213659" value={mr}
             onChange={(e) => setMr(e.target.value)}
             className="w-full mt-1 p-2.5 border border-borde rounded focus:ring-2 focus:ring-acento outline-none text-tinta"
           />
