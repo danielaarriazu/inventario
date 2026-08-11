@@ -144,7 +144,7 @@ export default function AltaPlanilla() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>N° de Equipo (patrimonio)</label>
+                <label className={labelClass}>N° de Equipo</label>
                 <input value={form.numero_equipo} onChange={e => setCampo('numero_equipo', e.target.value)} placeholder="Ej: SGNAWI0001" className={inputClass} />
               </div>
               <div>

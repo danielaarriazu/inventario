@@ -400,7 +400,7 @@ export default function Movimientos() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                      <label className={labelClass}>N° de Equipo (patrimonio)</label>
+                      <label className={labelClass}>N° de Equipo</label>
                       <input value={componentes.numero_equipo ?? ''} onChange={e => setCampoComponente('numero_equipo', e.target.value)} className={inputClass} />
                     </div>
                     <div>
