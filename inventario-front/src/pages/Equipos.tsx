@@ -186,42 +186,67 @@ export default function Equipos() {
               No se encontraron equipos con esos criterios.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
-                <thead>
-                  <tr className="bg-fondo border-b border-borde text-texto-sec text-xs tracking-wide uppercase">
-                    <th className="p-4 font-bold">N° Equipo</th>
-                    <th className="p-4 font-bold">Responsable</th>
-                    <th className="p-4 font-bold">Ubicación</th>
-                    <th className="p-4 font-bold">Sistema</th>
-                    <th className="p-4 font-bold">Conexión</th>
-                    <th className="p-4 font-bold">Estado</th>
-                    <th className="p-4"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-borde">
-                  {equiposFiltrados.map(eq => (
-                    <tr
-                      key={eq.id_planilla}
-                      onClick={() => navigate(`/equipos/${eq.id_planilla}`)}
-                      className="hover:bg-fondo transition-colors cursor-pointer"
-                    >
-                      <td className="p-4 font-bold text-primario">{eq.numero_equipo}</td>
-                      <td className="p-4">{eq.usuario_responsable}</td>
-                      <td className="p-4 text-texto-sec">Ofic. {eq.oficina?.numero_oficina ?? '—'}</td>
-                      <td className="p-4 text-texto-sec">{eq.sistema_operativo?.replace('WINDOWS_', 'W')} · {eq.arquitectura?.replace('BITS_', '')} bits</td>
-                      <td className="p-4 text-texto-sec">{CONEXION_ETIQUETAS[eq.dominio_conexion] ?? eq.dominio_conexion}</td>
-                      <td className="p-4">
-                        <span className={`text-[10.5px] font-bold px-2.5 py-1 rounded-full ${ESTADO_ESTILOS[eq.estado_equipo]}`}>
-                          {ESTADO_ETIQUETAS[eq.estado_equipo]}
-                        </span>
-                      </td>
-                      <td className="p-4 text-acento font-bold text-xs">Ver →</td>
+            <>
+              {/* Tarjetas — mobile */}
+              <div className="md:hidden divide-y divide-borde">
+                {equiposFiltrados.map(eq => (
+                  <div
+                    key={eq.id_planilla}
+                    onClick={() => navigate(`/equipos/${eq.id_planilla}`)}
+                    className="p-4 active:bg-fondo transition-colors cursor-pointer"
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1.5">
+                      <span className="font-bold text-primario">{eq.numero_equipo}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${ESTADO_ESTILOS[eq.estado_equipo]}`}>
+                        {ESTADO_ETIQUETAS[eq.estado_equipo]}
+                      </span>
+                    </div>
+                    <div className="text-xs text-texto-sec">{eq.usuario_responsable} · Ofic. {eq.oficina?.numero_oficina ?? '—'}</div>
+                    <div className="text-xs text-texto-sec mt-0.5">
+                      {eq.sistema_operativo?.replace('WINDOWS_', 'W')} · {eq.arquitectura?.replace('BITS_', '')} bits · {CONEXION_ETIQUETAS[eq.dominio_conexion] ?? eq.dominio_conexion}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tabla — desktop / tablet */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-fondo border-b border-borde text-texto-sec text-xs tracking-wide uppercase">
+                      <th className="p-4 font-bold">N° Equipo</th>
+                      <th className="p-4 font-bold">Responsable</th>
+                      <th className="p-4 font-bold">Ubicación</th>
+                      <th className="p-4 font-bold">Sistema</th>
+                      <th className="p-4 font-bold">Conexión</th>
+                      <th className="p-4 font-bold">Estado</th>
+                      <th className="p-4"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-borde">
+                    {equiposFiltrados.map(eq => (
+                      <tr
+                        key={eq.id_planilla}
+                        onClick={() => navigate(`/equipos/${eq.id_planilla}`)}
+                        className="hover:bg-fondo transition-colors cursor-pointer"
+                      >
+                        <td className="p-4 font-bold text-primario">{eq.numero_equipo}</td>
+                        <td className="p-4">{eq.usuario_responsable}</td>
+                        <td className="p-4 text-texto-sec">Ofic. {eq.oficina?.numero_oficina ?? '—'}</td>
+                        <td className="p-4 text-texto-sec">{eq.sistema_operativo?.replace('WINDOWS_', 'W')} · {eq.arquitectura?.replace('BITS_', '')} bits</td>
+                        <td className="p-4 text-texto-sec">{CONEXION_ETIQUETAS[eq.dominio_conexion] ?? eq.dominio_conexion}</td>
+                        <td className="p-4">
+                          <span className={`text-[10.5px] font-bold px-2.5 py-1 rounded-full ${ESTADO_ESTILOS[eq.estado_equipo]}`}>
+                            {ESTADO_ETIQUETAS[eq.estado_equipo]}
+                          </span>
+                        </td>
+                        <td className="p-4 text-acento font-bold text-xs">Ver →</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </main>

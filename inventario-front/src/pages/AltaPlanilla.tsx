@@ -124,7 +124,7 @@ export default function AltaPlanilla() {
 
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Ubicación y responsable</h3>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <select value={selDestino} onChange={e => setSelDestino(e.target.value)} className={inputClass}>
                 <option value="">Destino...</option>
                 {destinos.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
@@ -142,7 +142,7 @@ export default function AltaPlanilla() {
                 {oficinas.map(o => <option key={o.id} value={o.id}>{o.nombre}</option>)}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>N° de Equipo (patrimonio)</label>
                 <input value={form.numero_equipo} onChange={e => setCampo('numero_equipo', e.target.value)} placeholder="Ej: SGNAWI0001" className={inputClass} />
@@ -163,7 +163,7 @@ export default function AltaPlanilla() {
               <label className={labelClass}>Usuario de Red</label>
               <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.INFORMATICA" className={inputClass} />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className={labelClass}>Dominio</label>
                 <select value={form.dominio_conexion} onChange={e => setCampo('dominio_conexion', e.target.value)} className={inputClass}>
@@ -196,7 +196,7 @@ export default function AltaPlanilla() {
               <label className={labelClass}>Procesador</label>
               <input value={form.procesador} onChange={e => setCampo('procesador', e.target.value)} placeholder="Ej: AMD Ryzen 7 5700" className={inputClass} />
             </div>
-            <div className="grid grid-cols-3 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
               <div>
                 <label className={labelClass}>Capacidad RAM</label>
                 <input value={form.ram_capacidad} onChange={e => setCampo('ram_capacidad', e.target.value)} placeholder="Ej: 8GB" className={inputClass} />
@@ -224,7 +224,7 @@ export default function AltaPlanilla() {
 
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Periféricos</h3>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
                 <label className={labelClass}>Monitor (modelo)</label>
                 <input value={form.monitor_modelo} onChange={e => setCampo('monitor_modelo', e.target.value)} placeholder="Ej: Philips 22&quot;" className={inputClass} />

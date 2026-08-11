@@ -296,7 +296,7 @@ export default function Movimientos() {
                   <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="N° de patrimonio, nombre de PC o responsable"
+                    placeholder="N° de equipo, nombre de PC o responsable"
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-acento"
@@ -398,7 +398,7 @@ export default function Movimientos() {
                     Ya viene precargado con lo que tenía el equipo — solo editá lo que realmente cambiaste.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className={labelClass}>N° de Equipo (patrimonio)</label>
                       <input value={componentes.numero_equipo ?? ''} onChange={e => setCampoComponente('numero_equipo', e.target.value)} className={inputClass} />
@@ -409,7 +409,7 @@ export default function Movimientos() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className={labelClass}>Procesador</label>
                       <input value={componentes.procesador ?? ''} onChange={e => setCampoComponente('procesador', e.target.value)} className={inputClass} />
@@ -439,7 +439,7 @@ export default function Movimientos() {
                     <CampoMultilinea valores={hardwareOtros} onChange={setHardwareOtros} placeholder="Ej: se agregó placa de video" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label className={labelClass}>Monitor (modelo)</label>
                       <input value={componentes.monitor_modelo ?? ''} onChange={e => setCampoComponente('monitor_modelo', e.target.value)} className={inputClass} />
