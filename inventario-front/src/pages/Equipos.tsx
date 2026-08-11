@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { ArrowLeft, Search, PlusCircle, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Search, PlusCircle, FileSpreadsheet, X } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -10,6 +10,7 @@ interface Equipo {
   usuario_responsable: string;
   sistema_operativo: string;
   arquitectura: string;
+  dominio_conexion: string;
   estado_equipo: 'ACTIVO' | 'REPARACION' | 'BAJA';
   oficina?: { numero_oficina: string };
 }
@@ -25,23 +26,38 @@ const ESTADO_ETIQUETAS: Record<string, string> = {
   BAJA: 'BAJA',
 };
 
+const CONEXIONES = ['TODAS', 'RINA', 'INTERNET_ARA', 'INTERNET', 'SIN_CONEXION'] as const;
+const CONEXION_ETIQUETAS: Record<string, string> = {
+  RINA: 'RINA',
+  INTERNET_ARA: 'Internet ARA',
+  INTERNET: 'Internet',
+  SIN_CONEXION: 'Sin conexión',
+};
+
 export default function Equipos() {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState<'TODOS' | 'ACTIVO' | 'REPARACION' | 'BAJA'>('TODOS');
+  const [filtroConexion, setFiltroConexion] = useState<typeof CONEXIONES[number]>('TODAS');
   const [descargando, setDescargando] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+
+  const idOficina = searchParams.get('id_oficina');
+  const numeroOficina = (location.state as { numeroOficina?: string })?.numeroOficina;
 
   const fetchEquipos = async () => {
     try {
-      const response = await api.get('/equipos');
+      const url = idOficina ? `/equipos?id_oficina=${idOficina}` : '/equipos';
+      const response = await api.get(url);
       setEquipos(response.data);
     } catch (error: any) {
       if (error.response?.status === 401 || error.response?.status === 403) navigate('/');
     }
   };
 
-  useEffect(() => { fetchEquipos(); }, []);
+  useEffect(() => { fetchEquipos(); }, [idOficina]);
 
   const handleDescargarExcel = async () => {
     setDescargando(true);
@@ -64,14 +80,16 @@ export default function Equipos() {
 
   const equiposFiltrados = equipos.filter(eq => {
     const pasaEstado = filtroEstado === 'TODOS' || eq.estado_equipo === filtroEstado;
+    const pasaConexion = filtroConexion === 'TODAS' || eq.dominio_conexion === filtroConexion;
     const pasaBusqueda = busqueda.trim().length === 0 ||
       eq.numero_equipo.toLowerCase().includes(busqueda.toLowerCase()) ||
       eq.nombre_equipo?.toLowerCase().includes(busqueda.toLowerCase()) ||
       eq.usuario_responsable?.toLowerCase().includes(busqueda.toLowerCase());
-    return pasaEstado && pasaBusqueda;
+    return pasaEstado && pasaConexion && pasaBusqueda;
   });
 
-  const contar = (estado: string) => estado === 'TODOS' ? equipos.length : equipos.filter(e => e.estado_equipo === estado).length;
+  const contarEstado = (estado: string) => estado === 'TODOS' ? equipos.length : equipos.filter(e => e.estado_equipo === estado).length;
+  const contarConexion = (con: string) => con === 'TODAS' ? equipos.length : equipos.filter(e => e.dominio_conexion === con).length;
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
@@ -85,6 +103,20 @@ export default function Equipos() {
       </nav>
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
+        {idOficina && (
+          <div className="flex items-center justify-between bg-champagne/40 border border-champagne rounded-lg px-4 py-2.5 mb-4 text-sm">
+            <span className="font-bold text-primario">
+              Mostrando equipos de Oficina {numeroOficina ?? idOficina}
+            </span>
+            <button
+              onClick={() => navigate('/dashboard/equipos')}
+              className="flex items-center gap-1 text-primario font-bold text-xs cursor-pointer hover:underline"
+            >
+              <X className="w-3.5 h-3.5" /> Ver todos
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-superficie p-6 rounded-xl border border-borde shadow-sm">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-primario">Equipos</h2>
@@ -118,7 +150,7 @@ export default function Equipos() {
           />
         </div>
 
-        <div className="flex gap-2 mb-5 flex-wrap">
+        <div className="flex gap-2 mb-3 flex-wrap">
           {(['TODOS', 'ACTIVO', 'REPARACION', 'BAJA'] as const).map(f => (
             <button
               key={f}
@@ -127,7 +159,21 @@ export default function Equipos() {
                 filtroEstado === f ? 'bg-primario border-primario text-white' : 'bg-superficie border-borde text-texto-sec hover:border-primario/40'
               }`}
             >
-              {f === 'TODOS' ? 'Todos' : ESTADO_ETIQUETAS[f]} ({contar(f)})
+              {f === 'TODOS' ? 'Todos' : ESTADO_ETIQUETAS[f]} ({contarEstado(f)})
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2 mb-5 flex-wrap">
+          {CONEXIONES.map(c => (
+            <button
+              key={c}
+              onClick={() => setFiltroConexion(c)}
+              className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
+                filtroConexion === c ? 'bg-acento border-acento text-white' : 'bg-superficie border-borde text-texto-sec hover:border-acento/40'
+              }`}
+            >
+              {c === 'TODAS' ? 'Todas las conexiones' : CONEXION_ETIQUETAS[c]} ({contarConexion(c)})
             </button>
           ))}
         </div>
@@ -146,6 +192,7 @@ export default function Equipos() {
                     <th className="p-4 font-bold">Responsable</th>
                     <th className="p-4 font-bold">Ubicación</th>
                     <th className="p-4 font-bold">Sistema</th>
+                    <th className="p-4 font-bold">Conexión</th>
                     <th className="p-4 font-bold">Estado</th>
                     <th className="p-4"></th>
                   </tr>
@@ -161,6 +208,7 @@ export default function Equipos() {
                       <td className="p-4">{eq.usuario_responsable}</td>
                       <td className="p-4 text-texto-sec">Ofic. {eq.oficina?.numero_oficina ?? '—'}</td>
                       <td className="p-4 text-texto-sec">{eq.sistema_operativo?.replace('WINDOWS_', 'W')} · {eq.arquitectura?.replace('BITS_', '')} bits</td>
+                      <td className="p-4 text-texto-sec">{CONEXION_ETIQUETAS[eq.dominio_conexion] ?? eq.dominio_conexion}</td>
                       <td className="p-4">
                         <span className={`text-[10.5px] font-bold px-2.5 py-1 rounded-full ${ESTADO_ESTILOS[eq.estado_equipo]}`}>
                           {ESTADO_ETIQUETAS[eq.estado_equipo]}

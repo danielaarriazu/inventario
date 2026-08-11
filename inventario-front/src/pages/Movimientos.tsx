@@ -10,6 +10,7 @@ interface Equipo {
   numero_equipo: string;
   nombre_equipo: string;
   usuario_responsable: string;
+  nombre_usuario_red: string;
   procesador: string;
   ram_capacidad: string;
   tipo_ram: string;
@@ -65,6 +66,7 @@ export default function Movimientos() {
   const [selDepartamento, setSelDepartamento] = useState('');
   const [selDivision, setSelDivision] = useState('');
   const [selOficina, setSelOficina] = useState('');
+  const [nuevoResponsable, setNuevoResponsable] = useState('');
 
   // Cambio de componentes (solo para REPARACION, vinculado a la planilla real)
   const [cambioComponentes, setCambioComponentes] = useState(false);
@@ -75,6 +77,7 @@ export default function Movimientos() {
   const [observaciones, setObservaciones] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState('');
+  const [ultimoEquipoId, setUltimoEquipoId] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -137,6 +140,7 @@ export default function Movimientos() {
     setEquipoSeleccionado(eq);
     setBusqueda('');
     setComponentes(eq);
+    setNuevoResponsable(eq.usuario_responsable);
     setHardwareOtros(aLista(eq.hardware_otros));
     setPerifericosOtros(aLista(eq.perifericos_otros));
     setCambioComponentes(false);
@@ -148,6 +152,7 @@ export default function Movimientos() {
     setTipoAccion('');
     setObservaciones('');
     setSelDestino(''); setSelDepartamento(''); setSelDivision(''); setSelOficina('');
+    setNuevoResponsable('');
     setCambioComponentes(false);
     setComponentes(null);
     setHardwareOtros(['']);
@@ -193,8 +198,12 @@ export default function Movimientos() {
         observaciones: observaciones || undefined,
       };
 
-      if (tipoAccion === 'REPARACION' && cambioComponentes && componentes) {
+      if (tipoAccion === 'TRASPASO') {
+        payload.cambios = { usuario_responsable: nuevoResponsable };
+      } else if (tipoAccion === 'REPARACION' && cambioComponentes && componentes) {
         payload.cambios = {
+          numero_equipo: componentes.numero_equipo,
+          nombre_usuario_red: componentes.nombre_usuario_red,
           procesador: componentes.procesador,
           ram_capacidad: componentes.ram_capacidad,
           tipo_ram: componentes.tipo_ram,
@@ -210,8 +219,10 @@ export default function Movimientos() {
         };
       }
 
-      await api.post(`/equipos/${equipoSeleccionado.id_planilla}/movimiento`, payload);
+      const idEquipo = equipoSeleccionado.id_planilla;
+      await api.post(`/equipos/${idEquipo}/movimiento`, payload);
       setMensaje('Movimiento guardado correctamente.');
+      setUltimoEquipoId(idEquipo);
       resetForm();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al guardar el movimiento');
@@ -240,8 +251,19 @@ export default function Movimientos() {
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
 
           {mensaje && (
-            <div className="flex items-center gap-2 bg-activo/10 text-activo border border-activo/30 rounded-lg p-3 text-sm font-semibold">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> {mensaje}
+            <div className="flex items-center justify-between gap-2 bg-activo/10 text-activo border border-activo/30 rounded-lg p-3 text-sm font-semibold">
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> {mensaje}
+              </span>
+              {ultimoEquipoId && (
+                <button
+                  type="button"
+                  onClick={() => navigate(`/equipos/${ultimoEquipoId}`)}
+                  className="text-activo underline font-bold text-xs whitespace-nowrap cursor-pointer"
+                >
+                  Ver Ficha →
+                </button>
+              )}
             </div>
           )}
           {error && (
@@ -325,7 +347,7 @@ export default function Movimientos() {
             </div>
           </div>
 
-          {/* 3. Nueva ubicación (solo si Traspaso) */}
+          {/* 3. Nueva ubicación + responsable (solo si Traspaso) */}
           {tipoAccion === 'TRASPASO' && (
             <div className="bg-champagne/40 border border-champagne rounded-lg p-3 space-y-2">
               <div className="text-xs font-bold text-primario uppercase tracking-wide">Nueva ubicación</div>
@@ -345,6 +367,14 @@ export default function Movimientos() {
                 <option value="">Oficina...</option>
                 {oficinasDestino.map(o => <option key={o.id} value={o.id}>{o.nombre}</option>)}
               </select>
+              <div>
+                <label className={labelClass}>Nuevo responsable</label>
+                <input
+                  value={nuevoResponsable}
+                  onChange={e => setNuevoResponsable(e.target.value)}
+                  className="w-full p-2 border border-borde rounded text-sm bg-superficie"
+                />
+              </div>
             </div>
           )}
 
@@ -365,6 +395,17 @@ export default function Movimientos() {
                   <p className="text-[11px] text-texto-sec -mt-1">
                     Ya viene precargado con lo que tenía el equipo — solo editá lo que realmente cambiaste.
                   </p>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className={labelClass}>N° de Equipo (patrimonio)</label>
+                      <input value={componentes.numero_equipo ?? ''} onChange={e => setCampoComponente('numero_equipo', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Usuario de Red</label>
+                      <input value={componentes.nombre_usuario_red ?? ''} onChange={e => setCampoComponente('nombre_usuario_red', e.target.value)} className={inputClass} />
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>

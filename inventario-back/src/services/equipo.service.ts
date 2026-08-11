@@ -1,7 +1,7 @@
 import prisma from '../config/db';
 import QRCode from 'qrcode';
 
-export const obtenerEquipos = async (id_cargo: number) => {
+export const obtenerEquipos = async (id_cargo: number, id_oficina?: number) => {
   return await prisma.planilla_Equipo.findMany({
     where: {
       // Magia de Prisma: Buscamos solo los equipos cuyo destino pertenezca a este cargo
@@ -13,7 +13,8 @@ export const obtenerEquipos = async (id_cargo: number) => {
             }
           }
         }
-      }
+      },
+      ...(id_oficina ? { id_oficina } : {})
     },
     include: {
       oficina: {

@@ -84,11 +84,18 @@ export default function Oficinas() {
             oficinas.map(of => (
               <div
                 key={of.id_oficina}
-                className="bg-superficie p-6 rounded-xl border border-borde shadow-sm"
+                onClick={() => navigate(`/dashboard/equipos?id_oficina=${of.id_oficina}`, {
+                  state: { numeroOficina: of.numero_oficina }
+                })}
+                className="group bg-superficie p-6 rounded-xl border border-borde hover:border-acento/50 shadow-sm transition-colors cursor-pointer"
               >
-                <h3 className="text-lg font-bold text-primario flex items-center gap-2">
+                <h3 className="text-lg font-bold text-primario flex items-center gap-2 group-hover:text-acento transition-colors">
                   <DoorOpen className="w-4 h-4 text-acento" /> Oficina {of.numero_oficina}
                 </h3>
+                <div className="mt-4 pt-3 border-t border-borde flex justify-end items-center text-xs font-bold text-acento">
+                  <span>Ver Equipos</span>
+                  <span className="ml-1 transform group-hover:translate-x-1 transition-transform">→</span>
+                </div>
               </div>
             ))
           )}
