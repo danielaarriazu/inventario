@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoAuxiliar from '../components/ModalNuevoAuxiliar';
-import { Users, PlusCircle, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
 
 interface Auxiliar {
   id_usuario: number;
@@ -14,6 +15,7 @@ interface Auxiliar {
 export default function Auxiliares() {
   const [auxiliares, setAuxiliares] = useState<Auxiliar[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchAuxiliares = async () => {
@@ -39,10 +41,10 @@ export default function Auxiliares() {
       <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => setSidebarOpen(true)}
             className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <MenuIcon className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-bold text-white tracking-wide">
             Auxiliares de mi Cargo
@@ -120,6 +122,8 @@ export default function Auxiliares() {
         onClose={() => setIsModalOpen(false)}
         onAuxiliarCreado={fetchAuxiliares}
       />
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

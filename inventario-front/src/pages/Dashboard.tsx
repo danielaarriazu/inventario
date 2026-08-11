@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDestino from '../components/ModalNuevoDestino';
-import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, ArrowLeft, Monitor } from 'lucide-react';
+import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, Menu as MenuIcon, Monitor } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
 
 interface Destino {
   id_destino: number;
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [destinos, setDestinos] = useState<Destino[]>([]);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDestinos = async () => {
@@ -60,10 +62,10 @@ export default function Dashboard() {
       <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/menu')}
+            onClick={() => setSidebarOpen(true)}
             className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <MenuIcon className="w-5 h-5" />
           </button>
           <div className="bg-white/10 p-2 rounded-lg">
             <Shield className="w-6 h-6 text-white" />
@@ -168,6 +170,8 @@ export default function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         onDestinoCreado={fetchDestinos}
       />
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }
