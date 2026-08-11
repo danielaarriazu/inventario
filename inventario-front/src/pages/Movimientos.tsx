@@ -2,13 +2,26 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import EscanerQR from '../components/EscanerQR';
-import { ArrowLeft, Search, X, CheckCircle2, QrCode } from 'lucide-react';
+import CampoMultilinea from '../components/CampoMultilinea';
+import { ArrowLeft, Search, X, CheckCircle2, QrCode, Wrench } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
   numero_equipo: string;
   nombre_equipo: string;
   usuario_responsable: string;
+  procesador: string;
+  ram_capacidad: string;
+  tipo_ram: string;
+  disco: string;
+  hardware_otros: string | null;
+  monitor_modelo: string | null;
+  monitor_tamano: string | null;
+  impresora_modelo: string | null;
+  impresora_insumos: string | null;
+  tiene_teclado: boolean;
+  tiene_mouse: boolean;
+  perifericos_otros: string | null;
   oficina?: { numero_oficina: string };
 }
 interface Perfil { nombre_apellido: string; mr: string; }
@@ -20,6 +33,15 @@ const TIPOS_ACCION = [
   { valor: 'REPARACION', etiqueta: 'Reparación' },
   { valor: 'BAJA_DEFINITIVA', etiqueta: 'Baja' },
 ];
+
+const inputClass = "w-full p-2 border border-borde rounded text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento text-tinta";
+const labelClass = "text-[10.5px] font-bold text-texto-sec uppercase tracking-wide block mb-1";
+
+const aLista = (valor: string | null) => {
+  const lista = (valor ?? '').split('\n').filter(v => v.trim());
+  return lista.length > 0 ? lista : [''];
+};
+const aTexto = (lista: string[]) => lista.filter(v => v.trim()).join('\n') || null;
 
 export default function Movimientos() {
   const navigate = useNavigate();
@@ -43,6 +65,12 @@ export default function Movimientos() {
   const [selDepartamento, setSelDepartamento] = useState('');
   const [selDivision, setSelDivision] = useState('');
   const [selOficina, setSelOficina] = useState('');
+
+  // Cambio de componentes (solo para REPARACION, vinculado a la planilla real)
+  const [cambioComponentes, setCambioComponentes] = useState(false);
+  const [componentes, setComponentes] = useState<any>(null);
+  const [hardwareOtros, setHardwareOtros] = useState<string[]>(['']);
+  const [perifericosOtros, setPerifericosOtros] = useState<string[]>(['']);
 
   const [observaciones, setObservaciones] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -105,12 +133,25 @@ export default function Movimientos() {
       ).slice(0, 6)
     : [];
 
+  const seleccionarEquipo = (eq: Equipo) => {
+    setEquipoSeleccionado(eq);
+    setBusqueda('');
+    setComponentes(eq);
+    setHardwareOtros(aLista(eq.hardware_otros));
+    setPerifericosOtros(aLista(eq.perifericos_otros));
+    setCambioComponentes(false);
+  };
+
   const resetForm = () => {
     setEquipoSeleccionado(null);
     setBusqueda('');
     setTipoAccion('');
     setObservaciones('');
     setSelDestino(''); setSelDepartamento(''); setSelDivision(''); setSelOficina('');
+    setCambioComponentes(false);
+    setComponentes(null);
+    setHardwareOtros(['']);
+    setPerifericosOtros(['']);
   };
 
   const handleQRDetectado = (textoLeido: string) => {
@@ -119,7 +160,6 @@ export default function Movimientos() {
       setError('No se pudo acceder a la cámara o no se detectó ningún QR.');
       return;
     }
-    // El QR trae una URL tipo https://.../equipos/123 — nos quedamos con el ID del final
     const match = textoLeido.match(/\/equipos\/(\d+)/);
     const id = match ? Number(match[1]) : null;
     if (!id) {
@@ -132,9 +172,10 @@ export default function Movimientos() {
       return;
     }
     setError('');
-    setEquipoSeleccionado(encontrado);
-    setBusqueda('');
+    seleccionarEquipo(encontrado);
   };
+
+  const setCampoComponente = (campo: string, valor: any) => setComponentes((prev: any) => ({ ...prev, [campo]: valor }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,11 +187,30 @@ export default function Movimientos() {
 
     setEnviando(true);
     try {
-      await api.post(`/equipos/${equipoSeleccionado.id_planilla}/movimiento`, {
+      const payload: any = {
         tipo_accion: tipoAccion,
         id_oficina_destino: tipoAccion === 'TRASPASO' ? Number(selOficina) : undefined,
         observaciones: observaciones || undefined,
-      });
+      };
+
+      if (tipoAccion === 'REPARACION' && cambioComponentes && componentes) {
+        payload.cambios = {
+          procesador: componentes.procesador,
+          ram_capacidad: componentes.ram_capacidad,
+          tipo_ram: componentes.tipo_ram,
+          disco: componentes.disco,
+          hardware_otros: aTexto(hardwareOtros),
+          monitor_modelo: componentes.monitor_modelo,
+          monitor_tamano: componentes.monitor_tamano,
+          impresora_modelo: componentes.impresora_modelo,
+          impresora_insumos: componentes.impresora_insumos,
+          tiene_teclado: componentes.tiene_teclado,
+          tiene_mouse: componentes.tiene_mouse,
+          perifericos_otros: aTexto(perifericosOtros),
+        };
+      }
+
+      await api.post(`/equipos/${equipoSeleccionado.id_planilla}/movimiento`, payload);
       setMensaje('Movimiento guardado correctamente.');
       resetForm();
     } catch (err: any) {
@@ -223,7 +283,7 @@ export default function Movimientos() {
                         <button
                           type="button"
                           key={eq.id_planilla}
-                          onClick={() => { setEquipoSeleccionado(eq); setBusqueda(''); }}
+                          onClick={() => seleccionarEquipo(eq)}
                           className="w-full text-left px-3 py-2.5 hover:bg-fondo transition-colors border-b border-borde last:border-0 cursor-pointer"
                         >
                           <div className="font-bold text-sm text-primario">{eq.numero_equipo}</div>
@@ -285,6 +345,91 @@ export default function Movimientos() {
                 <option value="">Oficina...</option>
                 {oficinasDestino.map(o => <option key={o.id} value={o.id}>{o.nombre}</option>)}
               </select>
+            </div>
+          )}
+
+          {/* 3b. Cambio de componentes (solo si Reparación, y hay un equipo elegido) */}
+          {tipoAccion === 'REPARACION' && equipoSeleccionado && componentes && (
+            <div className="bg-superficie border border-borde rounded-lg p-3">
+              <label className="flex items-center gap-2 text-sm font-bold text-primario cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={cambioComponentes}
+                  onChange={e => setCambioComponentes(e.target.checked)}
+                />
+                <Wrench className="w-4 h-4" /> Se cambió algún componente (actualiza la planilla)
+              </label>
+
+              {cambioComponentes && (
+                <div className="mt-3 space-y-3">
+                  <p className="text-[11px] text-texto-sec -mt-1">
+                    Ya viene precargado con lo que tenía el equipo — solo editá lo que realmente cambiaste.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className={labelClass}>Procesador</label>
+                      <input value={componentes.procesador ?? ''} onChange={e => setCampoComponente('procesador', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Disco</label>
+                      <input value={componentes.disco ?? ''} onChange={e => setCampoComponente('disco', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Capacidad RAM</label>
+                      <input value={componentes.ram_capacidad ?? ''} onChange={e => setCampoComponente('ram_capacidad', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Tipo de RAM</label>
+                      <select value={componentes.tipo_ram ?? ''} onChange={e => setCampoComponente('tipo_ram', e.target.value)} className={inputClass}>
+                        <option value="DDR5">DDR5</option>
+                        <option value="DDR4">DDR4</option>
+                        <option value="DDR3">DDR3</option>
+                        <option value="DDR2">DDR2</option>
+                        <option value="DDR">DDR</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Otros (hardware)</label>
+                    <CampoMultilinea valores={hardwareOtros} onChange={setHardwareOtros} placeholder="Ej: se agregó placa de video" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className={labelClass}>Monitor (modelo)</label>
+                      <input value={componentes.monitor_modelo ?? ''} onChange={e => setCampoComponente('monitor_modelo', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Monitor (tamaño)</label>
+                      <input value={componentes.monitor_tamano ?? ''} onChange={e => setCampoComponente('monitor_tamano', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Impresora (modelo)</label>
+                      <input value={componentes.impresora_modelo ?? ''} onChange={e => setCampoComponente('impresora_modelo', e.target.value)} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Impresora (insumos)</label>
+                      <input value={componentes.impresora_insumos ?? ''} onChange={e => setCampoComponente('impresora_insumos', e.target.value)} className={inputClass} />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="checkbox" checked={componentes.tiene_teclado} onChange={e => setCampoComponente('tiene_teclado', e.target.checked)} /> Tiene teclado
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="checkbox" checked={componentes.tiene_mouse} onChange={e => setCampoComponente('tiene_mouse', e.target.checked)} /> Tiene mouse
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Otros periféricos</label>
+                    <CampoMultilinea valores={perifericosOtros} onChange={setPerifericosOtros} placeholder="Ej: parlantes externos" />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

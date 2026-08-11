@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import CampoMultilinea from '../components/CampoMultilinea';
 import { ArrowLeft } from 'lucide-react';
 
 interface OpcionSimple { id: number; nombre: string; }
@@ -13,7 +14,6 @@ export default function AltaPlanilla() {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
 
-  // Ubicación en cascada
   const [destinos, setDestinos] = useState<OpcionSimple[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSimple[]>([]);
   const [divisiones, setDivisiones] = useState<OpcionSimple[]>([]);
@@ -23,11 +23,12 @@ export default function AltaPlanilla() {
   const [selDivision, setSelDivision] = useState('');
   const [selOficina, setSelOficina] = useState('');
 
+  const [hardwareOtros, setHardwareOtros] = useState<string[]>(['']);
+  const [perifericosOtros, setPerifericosOtros] = useState<string[]>(['']);
+
   const [form, setForm] = useState({
     numero_equipo: '',
-    correlativo_dominio: '1',
     usuario_responsable: '',
-    nombre_equipo: '',
     nombre_usuario_red: '',
     dominio_conexion: 'RINA',
     sistema_operativo: 'WINDOWS_11',
@@ -36,14 +37,12 @@ export default function AltaPlanilla() {
     tipo_ram: 'DDR4',
     ram_capacidad: '',
     disco: '',
-    hardware_otros: '',
     monitor_modelo: '',
     monitor_tamano: '',
     impresora_modelo: '',
     impresora_insumos: '',
     tiene_teclado: true,
     tiene_mouse: true,
-    perifericos_otros: '',
   });
 
   const setCampo = (campo: string, valor: any) => setForm(prev => ({ ...prev, [campo]: valor }));
@@ -88,7 +87,7 @@ export default function AltaPlanilla() {
     setError('');
 
     if (!selOficina) { setError('Elegí la oficina donde va a estar el equipo'); return; }
-    if (!form.numero_equipo || !form.usuario_responsable || !form.nombre_equipo || !form.nombre_usuario_red || !form.procesador || !form.ram_capacidad || !form.disco) {
+    if (!form.numero_equipo || !form.usuario_responsable || !form.nombre_usuario_red || !form.procesador || !form.ram_capacidad || !form.disco) {
       setError('Completá todos los campos obligatorios');
       return;
     }
@@ -97,8 +96,9 @@ export default function AltaPlanilla() {
     try {
       const response = await api.post('/equipos', {
         ...form,
-        correlativo_dominio: Number(form.correlativo_dominio),
         id_oficina: Number(selOficina),
+        hardware_otros: hardwareOtros.filter(v => v.trim()).join('\n') || null,
+        perifericos_otros: perifericosOtros.filter(v => v.trim()).join('\n') || null,
       });
       navigate(`/equipos/${response.data.id_planilla}`);
     } catch (err: any) {
@@ -122,7 +122,6 @@ export default function AltaPlanilla() {
             <div className="bg-baja/10 text-baja border border-baja/30 rounded-lg p-3 text-sm font-semibold">{error}</div>
           )}
 
-          {/* Ubicación y responsable */}
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Ubicación y responsable</h3>
             <div className="grid grid-cols-2 gap-3 mb-3">
@@ -155,18 +154,14 @@ export default function AltaPlanilla() {
             </div>
           </div>
 
-          {/* Software / Red */}
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Software y red</h3>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className={labelClass}>Nombre de PC</label>
-                <input value={form.nombre_equipo} onChange={e => setCampo('nombre_equipo', e.target.value)} placeholder="Ej: PC-INFO-01" className={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass}>Usuario de Red</label>
-                <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.CONTRATACION" className={inputClass} />
-              </div>
+            <div className="bg-champagne/40 border border-champagne rounded-lg p-2.5 mb-3 text-xs text-primario">
+              El <b>nombre de PC</b> se genera solo, a partir de la oficina y el dominio elegidos (ej: <code>13-111.R5</code>) — no hace falta cargarlo a mano.
+            </div>
+            <div className="mb-3">
+              <label className={labelClass}>Usuario de Red</label>
+              <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.CONTRATACION" className={inputClass} />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
@@ -195,7 +190,6 @@ export default function AltaPlanilla() {
             </div>
           </div>
 
-          {/* Hardware */}
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Hardware</h3>
             <div className="mb-3">
@@ -224,11 +218,10 @@ export default function AltaPlanilla() {
             </div>
             <div>
               <label className={labelClass}>Otros (opcional)</label>
-              <input value={form.hardware_otros} onChange={e => setCampo('hardware_otros', e.target.value)} className={inputClass} />
+              <CampoMultilinea valores={hardwareOtros} onChange={setHardwareOtros} placeholder="Ej: placa de video agregada" />
             </div>
           </div>
 
-          {/* Periféricos */}
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Periféricos</h3>
             <div className="grid grid-cols-2 gap-3 mb-3">
@@ -259,7 +252,7 @@ export default function AltaPlanilla() {
             </div>
             <div>
               <label className={labelClass}>Otros periféricos (opcional)</label>
-              <input value={form.perifericos_otros} onChange={e => setCampo('perifericos_otros', e.target.value)} className={inputClass} />
+              <CampoMultilinea valores={perifericosOtros} onChange={setPerifericosOtros} placeholder="Ej: parlantes externos" />
             </div>
           </div>
 

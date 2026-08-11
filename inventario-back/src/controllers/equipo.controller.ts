@@ -34,11 +34,12 @@ export const getEquipoById = async (req: Request, res: Response) => {
 
 export const createEquipo = async (req: Request, res: Response) => {
   try {
-    const nuevoEquipo = await equipoService.crearEquipo(req.body);
+    const id_cargo = req.usuario!.id_cargo;
+    const nuevoEquipo = await equipoService.crearEquipo(req.body, id_cargo);
     res.status(201).json(nuevoEquipo);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error); 
-    res.status(500).json({ error: 'Error al registrar el equipo. Verifique los datos enviados.' });
+    res.status(400).json({ error: error.message || 'Error al registrar el equipo. Verifique los datos enviados.' });
   }
 };
 
@@ -98,7 +99,7 @@ export const registrarMovimiento = async (req: Request, res: Response): Promise<
       return;
     }
 
-    const { tipo_accion, id_oficina_destino, observaciones } = req.body;
+    const { tipo_accion, id_oficina_destino, observaciones, cambios } = req.body;
     const id_usuario = req.usuario!.id_usuario;
 
     if (!tipo_accion) {
@@ -111,7 +112,8 @@ export const registrarMovimiento = async (req: Request, res: Response): Promise<
       tipo_accion,
       id_usuario,
       id_oficina_destino,
-      observaciones
+      observaciones,
+      cambios
     );
     res.status(201).json(resultado);
   } catch (error: any) {

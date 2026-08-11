@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
+import CampoMultilinea from '../components/CampoMultilinea';
 import { ArrowLeft, Pencil, X, Download, QrCode } from 'lucide-react';
 
 interface Equipo {
@@ -60,6 +61,12 @@ const TIPO_ACCION_ETIQUETA: Record<string, string> = {
 const inputClass = "w-full p-2 border border-borde rounded text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento text-tinta";
 const labelClass = "text-[10.5px] font-bold text-texto-sec uppercase tracking-wide block mb-1";
 
+const aLista = (valor: string | null) => {
+  const lista = (valor ?? '').split('\n').filter(v => v.trim());
+  return lista.length > 0 ? lista : [''];
+};
+const aTexto = (lista: string[]) => lista.filter(v => v.trim()).join('\n') || null;
+
 export default function Ficha() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,6 +76,8 @@ export default function Ficha() {
   const [qrImage, setQrImage] = useState('');
   const [editando, setEditando] = useState(false);
   const [form, setForm] = useState<any>(null);
+  const [hardwareOtros, setHardwareOtros] = useState<string[]>(['']);
+  const [perifericosOtros, setPerifericosOtros] = useState<string[]>(['']);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
 
@@ -81,6 +90,8 @@ export default function Ficha() {
       ]);
       setEquipo(eqRes.data);
       setForm(eqRes.data);
+      setHardwareOtros(aLista(eqRes.data.hardware_otros));
+      setPerifericosOtros(aLista(eqRes.data.perifericos_otros));
       setHistorial(histRes.data);
       setQrImage(qrRes.data.qr_image);
     } catch (err: any) {
@@ -98,6 +109,8 @@ export default function Ficha() {
     setError('');
     try {
       const { id_planilla, oficina, estado_equipo, ...data } = form;
+      data.hardware_otros = aTexto(hardwareOtros);
+      data.perifericos_otros = aTexto(perifericosOtros);
       await api.put(`/equipos/${id}`, data);
       setEditando(false);
       cargarTodo();
@@ -106,6 +119,14 @@ export default function Ficha() {
     } finally {
       setGuardando(false);
     }
+  };
+
+  const cancelarEdicion = () => {
+    setForm(equipo);
+    setHardwareOtros(aLista(equipo!.hardware_otros));
+    setPerifericosOtros(aLista(equipo!.perifericos_otros));
+    setEditando(false);
+    setError('');
   };
 
   const handleDescargarQR = async () => {
@@ -130,11 +151,9 @@ export default function Ficha() {
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
 
-    // Copia 1 — CPU
     ctx.drawImage(img, padding, padding, qrSize, qrSize);
     ctx.fillText(`${equipo.numero_equipo} — CPU`, padding + qrSize / 2, padding + qrSize + 20);
 
-    // Copia 2 — MONITOR
     const x2 = padding + qrSize + gap;
     ctx.drawImage(img, x2, padding, qrSize, qrSize);
     ctx.fillText(`${equipo.numero_equipo} — MONITOR`, x2 + qrSize / 2, padding + qrSize + 20);
@@ -181,11 +200,11 @@ export default function Ficha() {
           <h1 className="text-lg font-bold text-white tracking-wide">Ficha de Equipo</h1>
         </div>
         {!editando ? (
-          <button onClick={() => { setForm(equipo); setEditando(true); }} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+          <button onClick={() => setEditando(true)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
             <Pencil className="w-4 h-4" /> Editar
           </button>
         ) : (
-          <button onClick={() => { setForm(equipo); setEditando(false); setError(''); }} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+          <button onClick={cancelarEdicion} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
             <X className="w-4 h-4" /> Cancelar
           </button>
         )}
@@ -194,8 +213,9 @@ export default function Ficha() {
       <main className="p-6 max-w-5xl mx-auto w-full flex-grow">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 bg-superficie border border-borde rounded-xl p-5 mb-5">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-xl font-bold text-primario">{equipo.numero_equipo}</h2>
+              <span className="text-xs text-texto-sec font-semibold">({equipo.nombre_equipo})</span>
               <span className={`text-[10.5px] font-bold px-2.5 py-1 rounded-full ${ESTADO_ESTILOS[equipo.estado_equipo]}`}>{equipo.estado_equipo}</span>
             </div>
             <p className="text-sm text-texto-sec mt-1">{ubicacion} · Responsable: {equipo.usuario_responsable}</p>
@@ -205,25 +225,31 @@ export default function Ficha() {
         {error && <div className="bg-baja/10 text-baja border border-baja/30 rounded-lg p-3 text-sm font-semibold mb-5">{error}</div>}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Datos del equipo */}
           <div className="lg:col-span-2 space-y-5">
             {[
               { titulo: 'Software y red', campos: [
-                ['nombre_equipo', 'Nombre de PC'], ['nombre_usuario_red', 'Usuario de Red'],
+                ['nombre_usuario_red', 'Usuario de Red'],
                 ['dominio_conexion', 'Dominio'], ['sistema_operativo', 'Sistema Operativo'], ['arquitectura', 'Arquitectura']
               ]},
               { titulo: 'Hardware', campos: [
                 ['procesador', 'Procesador'], ['ram_capacidad', 'RAM'], ['tipo_ram', 'Tipo de RAM'],
-                ['disco', 'Disco'], ['hardware_otros', 'Otros']
+                ['disco', 'Disco']
               ]},
               { titulo: 'Periféricos', campos: [
                 ['monitor_modelo', 'Monitor (modelo)'], ['monitor_tamano', 'Monitor (tamaño)'],
-                ['impresora_modelo', 'Impresora (modelo)'], ['impresora_insumos', 'Impresora (insumos)'],
-                ['perifericos_otros', 'Otros periféricos']
+                ['impresora_modelo', 'Impresora (modelo)'], ['impresora_insumos', 'Impresora (insumos)']
               ]},
             ].map(bloque => (
               <div key={bloque.titulo} className="bg-superficie border border-borde rounded-xl p-5">
                 <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">{bloque.titulo}</h3>
+
+                {bloque.titulo === 'Software y red' && (
+                  <div className="mb-3">
+                    <label className={labelClass}>Nombre de PC (autogenerado)</label>
+                    <div className="text-sm font-semibold">{equipo.nombre_equipo}</div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-3">
                   {bloque.campos.map(([campo, etiqueta]) => (
                     <div key={campo}>
@@ -236,6 +262,34 @@ export default function Ficha() {
                     </div>
                   ))}
                 </div>
+
+                {bloque.titulo === 'Hardware' && (
+                  <div className="mt-3">
+                    <label className={labelClass}>Otros</label>
+                    {editando ? (
+                      <CampoMultilinea valores={hardwareOtros} onChange={setHardwareOtros} placeholder="Ej: placa de video agregada" />
+                    ) : (
+                      <div className="text-sm font-semibold whitespace-pre-line">{equipo.hardware_otros || '—'}</div>
+                    )}
+                  </div>
+                )}
+
+                {bloque.titulo === 'Periféricos' && (
+                  <>
+                    <div className="flex gap-6 mt-3 mb-1 text-sm">
+                      <span>Teclado: <b>{equipo.tiene_teclado ? 'Sí' : 'No'}</b></span>
+                      <span>Mouse: <b>{equipo.tiene_mouse ? 'Sí' : 'No'}</b></span>
+                    </div>
+                    <div className="mt-2">
+                      <label className={labelClass}>Otros periféricos</label>
+                      {editando ? (
+                        <CampoMultilinea valores={perifericosOtros} onChange={setPerifericosOtros} placeholder="Ej: parlantes externos" />
+                      ) : (
+                        <div className="text-sm font-semibold whitespace-pre-line">{equipo.perifericos_otros || '—'}</div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             ))}
 
@@ -268,7 +322,6 @@ export default function Ficha() {
             </div>
           </div>
 
-          {/* QR y acciones */}
           <div className="space-y-5">
             {editando && (
               <button

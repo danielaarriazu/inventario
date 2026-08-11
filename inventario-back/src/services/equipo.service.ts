@@ -49,9 +49,46 @@ export const obtenerEquipoPorId = async (id_planilla: number) => {
   });
 };
 
-export const crearEquipo = async (data: any) => {
+const CODIGO_DOMINIO: Record<string, string> = {
+  RINA: 'R',
+  INTERNET_ARA: 'A',
+  INTERNET: 'I',
+  SIN_CONEXION: 'S'
+};
+
+export const crearEquipo = async (data: any, id_cargo: number) => {
+  const oficina = await prisma.oficina.findUnique({ where: { id_oficina: data.id_oficina } });
+  if (!oficina) {
+    throw new Error('La oficina seleccionada no existe');
+  }
+
+  const codigoDominio = CODIGO_DOMINIO[data.dominio_conexion];
+  if (!codigoDominio) {
+    throw new Error('Dominio de conexión no válido');
+  }
+
+  const cantidadExistente = await prisma.planilla_Equipo.count({
+    where: {
+      dominio_conexion: data.dominio_conexion,
+      oficina: {
+        division: {
+          departamento: {
+            destino: { id_cargo }
+          }
+        }
+      }
+    }
+  });
+
+  const correlativo = cantidadExistente + 1;
+  const nombreGenerado = `${oficina.numero_oficina}.${codigoDominio}${correlativo}`;
+
   return await prisma.planilla_Equipo.create({
-    data
+    data: {
+      ...data,
+      nombre_equipo: nombreGenerado,
+      correlativo_dominio: correlativo
+    }
   });
 };
 
@@ -146,13 +183,16 @@ const ETIQUETAS_TIPO_ACCION: Record<string, string> = {
 
 // Usado desde la pantalla de Movimientos: además de dejar el registro en el
 // historial, actualiza el propio equipo cuando el tipo de acción lo requiere
-// (Traspaso mueve la oficina real, Baja Definitiva marca el estado)
+// (Traspaso mueve la oficina real, Baja Definitiva marca el estado, y una
+// Reparación puede venir con cambios de componentes técnicos para sincronizar
+// la planilla de consignación)
 export const registrarMovimiento = async (
   id_planilla: number,
   tipo_accion: string,
   id_usuario: number,
   id_oficina_destino?: number,
-  observaciones?: string
+  observaciones?: string,
+  cambiosEquipo?: Record<string, any>
 ) => {
   const equipoViejo = await prisma.planilla_Equipo.findUnique({
     where: { id_planilla }
@@ -180,8 +220,20 @@ export const registrarMovimiento = async (
     dataEquipo.estado_equipo = 'BAJA';
     detalleCambios.estado_equipo = { antes: equipoViejo.estado_equipo, despues: 'BAJA' };
   }
-  // REPARACION y MANTENIMIENTO_PREVENTIVO no modifican el equipo en sí,
-  // solo quedan registrados en el historial
+
+  // Si vino algún cambio de componente (típicamente en una Reparación: se
+  // cambió la RAM, el disco, etc.), lo aplicamos a la planilla real y
+  // dejamos el antes/después asentado en el historial junto con todo lo demás
+  if (cambiosEquipo) {
+    for (const campo in cambiosEquipo) {
+      const valorNuevo = cambiosEquipo[campo];
+      const valorViejo = (equipoViejo as any)[campo];
+      if (valorNuevo !== valorViejo) {
+        dataEquipo[campo] = valorNuevo;
+        detalleCambios[campo] = { antes: valorViejo, despues: valorNuevo };
+      }
+    }
+  }
 
   const resultado = await prisma.$transaction(async (tx) => {
     const equipoActualizado = Object.keys(dataEquipo).length > 0
