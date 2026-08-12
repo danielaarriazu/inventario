@@ -1,20 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut, KeyRound } from 'lucide-react';
+import api from '../services/api';
+import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut, KeyRound, FileText } from 'lucide-react';
 import ModalCambiarPassword from './ModalCambiarPassword';
+import ModalEncabezado from './ModalEncabezado';
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
 }
 
-const ITEMS = [
+const ITEMS_BASE = [
   { path: '/menu', label: 'Menú Principal', icon: Home },
   { path: '/dashboard', label: 'Administrar (Destinos)', icon: LayoutDashboard },
   { path: '/dashboard/equipos', label: 'Equipos', icon: Monitor },
-  { path: '/dashboard/auxiliares', label: 'Auxiliares', icon: Users },
   { path: '/movimientos', label: 'Movimientos', icon: Wrench },
 ];
+const ITEM_AUXILIARES = { path: '/dashboard/auxiliares', label: 'Auxiliares', icon: Users };
 
 // Drawer lateral con acceso directo a todas las secciones — se abre desde
 // el botón de hamburguesa en la barra superior de cada pantalla principal
@@ -22,6 +24,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [encabezadoModalOpen, setEncabezadoModalOpen] = useState(false);
+  const [esResponsable, setEsResponsable] = useState(false);
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setEsResponsable(res.data.rol === 'RESPONSABLE')).catch(() => {});
+  }, []);
+
+  const items = esResponsable
+    ? [...ITEMS_BASE.slice(0, 3), ITEM_AUXILIARES, ITEMS_BASE[3]]
+    : ITEMS_BASE;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -56,7 +68,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         <nav className="p-3 space-y-1 flex-grow overflow-y-auto">
-          {ITEMS.map(item => {
+          {items.map(item => {
             const activo = location.pathname === item.path;
             const Icon = item.icon;
             return (
@@ -81,6 +93,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               <KeyRound className="w-4 h-4" />
               Cambiar mi contraseña
             </button>
+
+            {esResponsable && (
+              <button
+                onClick={() => setEncabezadoModalOpen(true)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-tinta hover:bg-fondo transition-colors cursor-pointer"
+              >
+                <FileText className="w-4 h-4" />
+                Encabezado de planillas
+              </button>
+            )}
           </div>
         </nav>
 
@@ -96,6 +118,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       </aside>
 
       <ModalCambiarPassword isOpen={passwordModalOpen} onClose={() => setPasswordModalOpen(false)} />
+      <ModalEncabezado isOpen={encabezadoModalOpen} onClose={() => setEncabezadoModalOpen(false)} />
     </>
   );
 }

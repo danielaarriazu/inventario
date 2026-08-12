@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Sidebar from '../components/Sidebar';
-import { Menu as MenuIcon, Search, PlusCircle, FileSpreadsheet, X } from 'lucide-react';
+import { Menu as MenuIcon, Search, PlusCircle, FileSpreadsheet } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -100,22 +100,16 @@ export default function Equipos() {
           <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
             <MenuIcon className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario</h1>
+          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario Patrimonial</h1>
         </div>
       </nav>
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
         {idOficina && (
-          <div className="flex items-center justify-between bg-champagne/40 border border-champagne rounded-lg px-4 py-2.5 mb-4 text-sm">
+          <div className="bg-champagne/40 border border-champagne rounded-lg px-4 py-2.5 mb-4 text-sm">
             <span className="font-bold text-primario">
-              Mostrando equipos de Oficina {numeroOficina ?? idOficina}
+              Equipos de Oficina {numeroOficina ?? idOficina}
             </span>
-            <button
-              onClick={() => navigate('/dashboard/equipos')}
-              className="flex items-center gap-1 text-primario font-bold text-xs cursor-pointer hover:underline"
-            >
-              <X className="w-3.5 h-3.5" /> Ver todos
-            </button>
           </div>
         )}
 
@@ -145,7 +139,7 @@ export default function Equipos() {
           <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por N° de equipo, nombre de PC o responsable..."
+            placeholder="Buscar por N° de patrimonio, nombre de PC o responsable..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento"

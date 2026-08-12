@@ -14,6 +14,7 @@ interface Destino {
 interface Perfil {
   nombre_apellido: string;
   mr: string;
+  rol: string;
 }
 
 export default function Dashboard() {
@@ -111,12 +112,14 @@ export default function Dashboard() {
             >
               <Monitor className="w-4 h-4" /> Ver Equipos
             </button>
-            <button
-              onClick={() => navigate('/dashboard/auxiliares')}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
-            >
-              <Users className="w-4 h-4" /> Ver Auxiliares
-            </button>
+            {perfil?.rol === 'RESPONSABLE' && (
+              <button
+                onClick={() => navigate('/dashboard/auxiliares')}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
+              >
+                <Users className="w-4 h-4" /> Ver Auxiliares
+              </button>
+            )}
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"

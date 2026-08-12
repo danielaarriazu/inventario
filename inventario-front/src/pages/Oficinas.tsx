@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
-import { DoorOpen, PlusCircle, ArrowLeft } from 'lucide-react';
+import { DoorOpen, PlusCircle, ArrowLeft, Printer } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
@@ -89,9 +89,23 @@ export default function Oficinas() {
                 })}
                 className="group bg-superficie p-6 rounded-xl border border-borde hover:border-acento/50 shadow-sm transition-colors cursor-pointer"
               >
-                <h3 className="text-lg font-bold text-primario flex items-center gap-2 group-hover:text-acento transition-colors">
-                  <DoorOpen className="w-4 h-4 text-acento" /> Oficina {of.numero_oficina}
-                </h3>
+                <div className="flex justify-between items-start">
+                  <h3 className="text-lg font-bold text-primario flex items-center gap-2 group-hover:text-acento transition-colors">
+                    <DoorOpen className="w-4 h-4 text-acento" /> Oficina {of.numero_oficina}
+                  </h3>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/dashboard/oficinas/${of.id_oficina}/imprimir`, {
+                        state: { numeroOficina: of.numero_oficina }
+                      });
+                    }}
+                    title="Imprimir todas las planillas de esta oficina"
+                    className="text-texto-sec hover:text-acento cursor-pointer flex-shrink-0"
+                  >
+                    <Printer className="w-4 h-4" />
+                  </button>
+                </div>
                 <div className="mt-4 pt-3 border-t border-borde flex justify-end items-center text-xs font-bold text-acento">
                   <span>Ver Equipos</span>
                   <span className="ml-1 transform group-hover:translate-x-1 transition-transform">→</span>

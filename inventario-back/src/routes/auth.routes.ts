@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registrarCargo, login, obtenerAuxiliares, registrarAuxiliar, obtenerPerfil, cambiarPassword, resetearPasswordAuxiliar } from '../controllers/auth.controller';
+import { registrarCargo, login, obtenerAuxiliares, registrarAuxiliar, obtenerPerfil, cambiarPassword, resetearPasswordAuxiliar, bajaAuxiliar } from '../controllers/auth.controller';
 import { verificarToken, soloResponsable  } from '../middlewares/auth.middleware';
 
 const router = Router();
@@ -19,10 +19,13 @@ router.put('/me/password', verificarToken, cambiarPassword);
 // POST /api/auth/companeros -> Registra un nuevo auxiliar en tu misma burbuja
 router.post('/companeros', verificarToken, soloResponsable, registrarAuxiliar);
 
-// GET /api/auth/companeros -> Trae solo los auxiliares de tu cargo
-router.get('/companeros', verificarToken, obtenerAuxiliares);
+// GET /api/auth/companeros -> Trae los auxiliares activos de tu cargo (solo el Responsable)
+router.get('/companeros', verificarToken, soloResponsable, obtenerAuxiliares);
 
 // PUT /api/auth/companeros/:id/password -> el Responsable resetea la contraseña de un auxiliar
 router.put('/companeros/:id/password', verificarToken, soloResponsable, resetearPasswordAuxiliar);
+
+// DELETE /api/auth/companeros/:id -> el Responsable da de baja (lógica) a un auxiliar
+router.delete('/companeros/:id', verificarToken, soloResponsable, bajaAuxiliar);
 
 export default router;

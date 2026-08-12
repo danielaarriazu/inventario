@@ -11,6 +11,8 @@ import Oficinas from './pages/Oficinas';
 import Equipos from './pages/Equipos';
 import AltaPlanilla from './pages/AltaPlanilla';
 import Ficha from './pages/Ficha';
+import ImprimirFicha from './pages/ImprimirFicha';
+import ImprimirOficina from './pages/ImprimirOficina';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/dashboard/equipos" element={<Equipos />} />
           <Route path="/dashboard/equipos/nuevo" element={<AltaPlanilla />} />
           <Route path="/equipos/:id" element={<Ficha />} />
+          <Route path="/equipos/:id/imprimir" element={<ImprimirFicha />} />
+          <Route path="/dashboard/oficinas/:idOficina/imprimir" element={<ImprimirOficina />} />
         </Routes>
       </div>
     </BrowserRouter>

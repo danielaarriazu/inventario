@@ -76,10 +76,11 @@ export const obtenerAuxiliares = async (req: Request, res: Response): Promise<vo
   try {
     const id_cargo = req.usuario!.id_cargo;
 
-    // Buscamos todos los usuarios que pertenezcan al mismo Cargo
+    // Buscamos todos los usuarios activos que pertenezcan al mismo Cargo
     const auxiliares = await prisma.usuario.findMany({
       where: {
-        id_cargo: id_cargo
+        id_cargo: id_cargo,
+        estado: true
       },
       select: {
         id_usuario: true,
@@ -165,5 +166,22 @@ export const resetearPasswordAuxiliar = async (req: Request, res: Response): Pro
     res.status(200).json({ mensaje: 'Contraseña reseteada correctamente' });
   } catch (error: any) {
     res.status(400).json({ error: error.message || 'Error al resetear la contraseña' });
+  }
+};
+
+// DELETE /api/auth/companeros/:id -> el Responsable da de baja a un auxiliar
+// (baja lógica: no se borra la fila, solo se inactiva)
+export const bajaAuxiliar = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idObjetivo = parseInt(req.params.id as string, 10);
+    if (isNaN(idObjetivo)) {
+      res.status(400).json({ error: 'El ID proporcionado no es válido' });
+      return;
+    }
+
+    await authService.bajaAuxiliar(idObjetivo, req.usuario!.id_usuario, req.usuario!.id_cargo);
+    res.status(200).json({ mensaje: 'Auxiliar dado de baja correctamente' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Error al dar de baja al auxiliar' });
   }
 };

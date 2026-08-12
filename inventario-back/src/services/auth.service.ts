@@ -109,3 +109,18 @@ export const resetearPasswordAuxiliar = async (id_usuario_objetivo: number, id_c
   const nuevoHash = await bcrypt.hash(passwordNueva, 10);
   await prisma.usuario.update({ where: { id_usuario: id_usuario_objetivo }, data: { password: nuevoHash } });
 };
+
+// 5. El Responsable da de baja a un auxiliar de su cargo (no se borra la fila:
+// se inactiva. Así no puede loguearse más ni aparece en el listado activo,
+// pero su nombre sigue intacto en todo lo que ya hizo en el historial)
+export const bajaAuxiliar = async (id_usuario_objetivo: number, id_usuario_responsable: number, id_cargo_responsable: number) => {
+  if (id_usuario_objetivo === id_usuario_responsable) {
+    throw new Error('No podés darte de baja a vos mismo');
+  }
+
+  const usuario = await prisma.usuario.findUnique({ where: { id_usuario: id_usuario_objetivo } });
+  if (!usuario) throw new Error('Auxiliar no encontrado');
+  if (usuario.id_cargo !== id_cargo_responsable) throw new Error('No tenés permiso sobre este usuario');
+
+  await prisma.usuario.update({ where: { id_usuario: id_usuario_objetivo }, data: { estado: false } });
+};

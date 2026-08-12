@@ -69,7 +69,9 @@ model Cargo {
   nombre_cargo String    
   estado       Boolean   @default(true) 
 
-  
+  encabezado_destino String @default("SECRETARIA GENERAL DE LA ARMADA")
+  encabezado_anio    String @default("2026")
+
   usuarios     Usuario[] 
   destinos     Destino[] 
 }

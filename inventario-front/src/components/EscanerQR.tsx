@@ -11,14 +11,14 @@ interface EscanerQRProps {
 // leído del QR (una URL completa, en nuestro caso) apenas lo detecta.
 export default function EscanerQR({ onDetectado, onClose }: EscanerQRProps) {
   const contenedorId = 'lector-qr-region';
-  const scannerRef = useRef<Html5Qrcode | null>(null);
   const yaLeidoRef = useRef(false);
 
   useEffect(() => {
     const scanner = new Html5Qrcode(contenedorId);
-    scannerRef.current = scanner;
+    let cancelado = false;
 
-    scanner
+    // Guardamos la promesa de arranque para poder esperarla en la limpieza
+    const arranque = scanner
       .start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 240, height: 240 } },
@@ -31,11 +31,20 @@ export default function EscanerQR({ onDetectado, onClose }: EscanerQRProps) {
       )
       .catch(() => {
         // No se pudo acceder a la cámara (permiso denegado, sin cámara, etc.)
-        onDetectado('');
+        if (!cancelado) onDetectado('');
       });
 
     return () => {
-      scanner.stop().then(() => scanner.clear()).catch(() => {});
+      cancelado = true;
+      // Clave: esperamos a que start() haya terminado de verdad (con éxito
+      // o con error) ANTES de frenar la cámara. Si se llama stop() mientras
+      // todavía está arrancando, la cámara puede quedar "trabada" y el
+      // próximo escaneo no agarra hasta un segundo intento.
+      arranque
+        .then(() => {
+          scanner.stop().then(() => scanner.clear()).catch(() => {});
+        })
+        .catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

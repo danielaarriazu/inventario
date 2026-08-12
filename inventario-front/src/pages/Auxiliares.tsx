@@ -4,7 +4,7 @@ import api from '../services/api';
 import ModalNuevoAuxiliar from '../components/ModalNuevoAuxiliar';
 import ModalResetearPassword from '../components/ModalResetearPassword';
 import Sidebar from '../components/Sidebar';
-import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert, KeyRound } from 'lucide-react';
+import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert, KeyRound, UserX } from 'lucide-react';
 
 interface Auxiliar {
   id_usuario: number;
@@ -40,6 +40,10 @@ export default function Auxiliares() {
     try {
       const response = await api.get('/auth/me');
       setPerfil(response.data);
+      // Un subordinado no puede gestionar auxiliares — ni por URL directa
+      if (response.data.rol !== 'RESPONSABLE') {
+        navigate('/menu');
+      }
     } catch (error) {
       console.error('Error al obtener el perfil', error);
     }
@@ -51,6 +55,20 @@ export default function Auxiliares() {
   }, []);
 
   const esResponsable = perfil?.rol === 'RESPONSABLE';
+
+  const handleBaja = async (aux: Auxiliar) => {
+    const confirmar = window.confirm(
+      `¿Dar de baja a ${aux.nombre_apellido} (MR ${aux.mr})?\n\nNo va a poder ingresar más al sistema. Su nombre sigue quedando en el historial de todo lo que ya hizo.`
+    );
+    if (!confirmar) return;
+
+    try {
+      await api.delete(`/auth/companeros/${aux.id_usuario}`);
+      fetchAuxiliares();
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Error al dar de baja al auxiliar');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
@@ -128,12 +146,20 @@ export default function Auxiliares() {
                       </td>
                       {esResponsable && (
                         <td className="p-4">
-                          <button
-                            onClick={() => setResetObjetivo(aux)}
-                            className="flex items-center gap-1.5 text-acento hover:underline text-xs font-bold cursor-pointer"
-                          >
-                            <KeyRound className="w-3.5 h-3.5" /> Resetear contraseña
-                          </button>
+                          <div className="flex items-center gap-4">
+                            <button
+                              onClick={() => setResetObjetivo(aux)}
+                              className="flex items-center gap-1.5 text-acento hover:underline text-xs font-bold cursor-pointer"
+                            >
+                              <KeyRound className="w-3.5 h-3.5" /> Resetear contraseña
+                            </button>
+                            <button
+                              onClick={() => handleBaja(aux)}
+                              className="flex items-center gap-1.5 text-baja hover:underline text-xs font-bold cursor-pointer"
+                            >
+                              <UserX className="w-3.5 h-3.5" /> Dar de baja
+                            </button>
+                          </div>
                         </td>
                       )}
                     </tr>

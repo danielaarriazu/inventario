@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import CampoMultilinea from '../components/CampoMultilinea';
-import { ArrowLeft, Pencil, X, Download, QrCode } from 'lucide-react';
+import { ArrowLeft, Pencil, X, Download, QrCode, Printer } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -199,15 +199,22 @@ export default function Ficha() {
           </button>
           <h1 className="text-lg font-bold text-white tracking-wide">Ficha de Equipo</h1>
         </div>
-        {!editando ? (
-          <button onClick={() => setEditando(true)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
-            <Pencil className="w-4 h-4" /> Editar
-          </button>
-        ) : (
-          <button onClick={cancelarEdicion} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
-            <X className="w-4 h-4" /> Cancelar
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {!editando && (
+            <button onClick={() => navigate(`/equipos/${id}/imprimir`)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+              <Printer className="w-4 h-4" /> Imprimir
+            </button>
+          )}
+          {!editando ? (
+            <button onClick={() => setEditando(true)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+              <Pencil className="w-4 h-4" /> Editar
+            </button>
+          ) : (
+            <button onClick={cancelarEdicion} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+              <X className="w-4 h-4" /> Cancelar
+            </button>
+          )}
+        </div>
       </nav>
 
       <main className="p-6 max-w-5xl mx-auto w-full flex-grow">

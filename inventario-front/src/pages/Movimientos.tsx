@@ -69,6 +69,7 @@ export default function Movimientos() {
   const [selDivision, setSelDivision] = useState('');
   const [selOficina, setSelOficina] = useState('');
   const [nuevoResponsable, setNuevoResponsable] = useState('');
+  const [sinUsuario, setSinUsuario] = useState(false);
 
   // Cambio de componentes (solo para REPARACION, vinculado a la planilla real)
   const [cambioComponentes, setCambioComponentes] = useState(false);
@@ -143,6 +144,7 @@ export default function Movimientos() {
     setBusqueda('');
     setComponentes(eq);
     setNuevoResponsable(eq.usuario_responsable);
+    setSinUsuario(false);
     setHardwareOtros(aLista(eq.hardware_otros));
     setPerifericosOtros(aLista(eq.perifericos_otros));
     setCambioComponentes(false);
@@ -155,6 +157,7 @@ export default function Movimientos() {
     setObservaciones('');
     setSelDestino(''); setSelDepartamento(''); setSelDivision(''); setSelOficina('');
     setNuevoResponsable('');
+    setSinUsuario(false);
     setCambioComponentes(false);
     setComponentes(null);
     setHardwareOtros(['']);
@@ -201,7 +204,7 @@ export default function Movimientos() {
       };
 
       if (tipoAccion === 'TRASPASO') {
-        payload.cambios = { usuario_responsable: nuevoResponsable };
+        payload.cambios = { usuario_responsable: sinUsuario ? 'Sin usuario' : nuevoResponsable };
       } else if (tipoAccion === 'REPARACION' && cambioComponentes && componentes) {
         payload.cambios = {
           numero_equipo: componentes.numero_equipo,
@@ -374,8 +377,18 @@ export default function Movimientos() {
                 <input
                   value={nuevoResponsable}
                   onChange={e => setNuevoResponsable(e.target.value)}
-                  className="w-full p-2 border border-borde rounded text-sm bg-superficie"
+                  disabled={sinUsuario}
+                  placeholder={sinUsuario ? 'Sin usuario' : ''}
+                  className="w-full p-2 border border-borde rounded text-sm bg-superficie disabled:opacity-50"
                 />
+                <label className="flex items-center gap-2 text-xs text-texto-sec mt-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sinUsuario}
+                    onChange={e => setSinUsuario(e.target.checked)}
+                  />
+                  Queda sin usuario asignado (disponible para reasignar después)
+                </label>
               </div>
             </div>
           )}
