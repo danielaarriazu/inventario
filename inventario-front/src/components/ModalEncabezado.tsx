@@ -81,7 +81,7 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Línea 1</label>
+            <label className={labelClass}>Division</label>
             <input required value={linea1} onChange={e => setLinea1(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
@@ -89,7 +89,7 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
             <input required value={destino} onChange={e => setDestino(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className={labelClass}>Línea 3 (Cargo)</label>
+            <label className={labelClass}>Cargo</label>
             <input required value={linea3} onChange={e => setLinea3(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
