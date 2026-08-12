@@ -44,7 +44,7 @@ export default function Auxiliares() {
     try {
       const response = await api.get('/auth/me');
       setPerfil(response.data);
-      // Un subordinado no puede gestionar auxiliares — ni por URL directa
+      // Un auxiliar no puede gestionar auxiliares — ni por URL directa
       if (response.data.rol !== 'RESPONSABLE') {
         navigate('/menu');
       }

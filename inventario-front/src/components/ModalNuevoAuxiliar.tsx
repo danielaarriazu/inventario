@@ -109,8 +109,8 @@ export default function ModalNuevoAuxiliar({ isOpen, onClose, onAuxiliarCreado }
               value={rol} onChange={(e) => setRol(e.target.value)}
               className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento cursor-pointer"
             >
-              <option value="SUBORDINADO">SUBORDINADO (Auxiliar)</option>
-              <option value="RESPONSABLE">RESPONSABLE (Encargado)</option>
+              <option value="SUBORDINADO">AUXILIAR</option>
+              <option value="RESPONSABLE">ENCARGADO</option>
             </select>
           </div>
 

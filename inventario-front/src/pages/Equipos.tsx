@@ -143,7 +143,7 @@ export default function Equipos() {
           <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por N° de patrimonio, nombre de PC o responsable..."
+            placeholder="Buscar por N° de equipo, nombre de PC o responsable..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento"
