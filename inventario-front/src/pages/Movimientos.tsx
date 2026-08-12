@@ -496,7 +496,7 @@ export default function Movimientos() {
           {/* 4. Observaciones */}
           <div>
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">
-              Observaciones{tipoAccion === 'REPARACION' && <span className="text-baja"> * (contá qué se hizo)</span>}
+              Observaciones{tipoAccion === 'REPARACION' && <span className="text-baja"> * </span>}
             </label>
             <textarea
               rows={3}
