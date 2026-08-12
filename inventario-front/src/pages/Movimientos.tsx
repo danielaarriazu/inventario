@@ -194,6 +194,10 @@ export default function Movimientos() {
     if (!equipoSeleccionado) { setError('Elegí un equipo'); return; }
     if (!tipoAccion) { setError('Elegí el tipo de acción'); return; }
     if (tipoAccion === 'TRASPASO' && !selOficina) { setError('Elegí la oficina destino'); return; }
+    if (tipoAccion === 'REPARACION' && !observaciones.trim()) {
+      setError('Contá en Observaciones qué se hizo en la reparación');
+      return;
+    }
 
     setEnviando(true);
     try {
@@ -491,7 +495,9 @@ export default function Movimientos() {
 
           {/* 4. Observaciones */}
           <div>
-            <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Observaciones</label>
+            <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">
+              Observaciones{tipoAccion === 'REPARACION' && <span className="text-baja"> * (contá qué se hizo)</span>}
+            </label>
             <textarea
               rows={3}
               value={observaciones}

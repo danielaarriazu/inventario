@@ -33,6 +33,7 @@ interface HistorialItem {
   id_historial: number;
   tipo_accion: string | null;
   motivo_cambio: string;
+  detalle_cambios: string;
   observaciones: string | null;
   fecha_modificacion: string;
   usuario: { nombre_apellido: string; mr: string } | null;
@@ -56,6 +57,44 @@ const TIPO_ACCION_ETIQUETA: Record<string, string> = {
   MANTENIMIENTO_PREVENTIVO: 'Mantenimiento preventivo',
   REPARACION: 'Reparación',
   BAJA_DEFINITIVA: 'Baja definitiva',
+};
+
+const ETIQUETAS_CAMPO: Record<string, string> = {
+  numero_equipo: 'N° de Equipo',
+  nombre_equipo: 'Nombre de PC',
+  nombre_usuario_red: 'Nombre de Usuario',
+  usuario_responsable: 'Usuario Responsable',
+  estado_equipo: 'Estado',
+  procesador: 'Procesador',
+  ram_capacidad: 'Capacidad RAM',
+  tipo_ram: 'Tipo de RAM',
+  disco: 'Disco',
+  hardware_otros: 'Otros (Hardware)',
+  monitor_modelo: 'Monitor',
+  monitor_tamano: 'Tamaño de Monitor',
+  impresora_modelo: 'Impresora',
+  impresora_insumos: 'Insumos de Impresora',
+  tiene_teclado: 'Teclado',
+  tiene_mouse: 'Mouse',
+  perifericos_otros: 'Otros Periféricos',
+};
+
+const formatearCambios = (h: HistorialItem): string[] => {
+  const lineas: string[] = [];
+  if (h.oficina_destino) {
+    lineas.push(`Nueva oficina: ${h.oficina_destino.numero_oficina}`);
+  }
+  try {
+    const cambios = JSON.parse(h.detalle_cambios || '{}');
+    Object.entries(cambios).forEach(([campo, valores]: [string, any]) => {
+      if (campo === 'id_oficina') return;
+      const etiqueta = ETIQUETAS_CAMPO[campo] || campo;
+      lineas.push(`${etiqueta}: ${valores?.antes ?? '—'} → ${valores?.despues ?? '—'}`);
+    });
+  } catch {
+    // detalle_cambios vacío o no parseable
+  }
+  return lineas;
 };
 
 const inputClass = "w-full p-2 border border-borde rounded text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento text-tinta";
@@ -314,24 +353,34 @@ export default function Ficha() {
                 <p className="text-sm text-texto-sec">Todavía no hay movimientos registrados para este equipo.</p>
               ) : (
                 <div className="space-y-0">
-                  {historial.map((h, i) => (
-                    <div key={h.id_historial} className={`flex gap-3 py-3 ${i > 0 ? 'border-t border-borde' : ''}`}>
-                      <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${h.tipo_accion ? TIPO_ACCION_COLOR[h.tipo_accion] : 'bg-texto-sec'}`} />
-                      <div>
-                        <div className="text-sm font-bold">
-                          {h.tipo_accion ? TIPO_ACCION_ETIQUETA[h.tipo_accion] : h.motivo_cambio}
-                          <span className="text-xs font-normal text-texto-sec"> · {new Date(h.fecha_modificacion).toLocaleDateString('es-AR')}</span>
+                  {historial.map((h, i) => {
+                    const cambios = formatearCambios(h);
+                    return (
+                      <div key={h.id_historial} className={`flex gap-3 py-3 ${i > 0 ? 'border-t border-borde' : ''}`}>
+                        <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${h.tipo_accion ? TIPO_ACCION_COLOR[h.tipo_accion] : 'bg-texto-sec'}`} />
+                        <div>
+                          <div className="text-sm font-bold">
+                            {h.tipo_accion ? TIPO_ACCION_ETIQUETA[h.tipo_accion] : h.motivo_cambio}
+                            <span className="text-xs font-normal text-texto-sec"> · {new Date(h.fecha_modificacion).toLocaleDateString('es-AR')}</span>
+                          </div>
+                          <div className="text-xs text-texto-sec mt-0.5">
+                            {h.usuario ? `${h.usuario.nombre_apellido} (MR ${h.usuario.mr})` : 'Usuario desconocido'}
+                          </div>
+                          {cambios.length > 0 && (
+                            <div className="text-xs text-tinta mt-1">
+                              {cambios.map((c, idx) => <div key={idx}>{c}</div>)}
+                            </div>
+                          )}
+                          {h.observaciones && (
+                            <div className="text-xs mt-1 inline-block bg-champagne text-primario px-2 py-0.5 rounded">{h.observaciones}</div>
+                          )}
+                          {cambios.length === 0 && !h.observaciones && (
+                            <div className="text-xs mt-1 text-texto-sec italic">Sin detalle registrado para este movimiento.</div>
+                          )}
                         </div>
-                        <div className="text-xs text-texto-sec mt-0.5">
-                          {h.usuario ? `${h.usuario.nombre_apellido} (MR ${h.usuario.mr})` : 'Usuario desconocido'}
-                          {h.oficina_destino ? ` — hacia Oficina ${h.oficina_destino.numero_oficina}` : ''}
-                        </div>
-                        {h.observaciones && (
-                          <div className="text-xs mt-1 inline-block bg-champagne text-primario px-2 py-0.5 rounded">{h.observaciones}</div>
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

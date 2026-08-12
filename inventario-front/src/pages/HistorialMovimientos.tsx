@@ -170,6 +170,9 @@ export default function HistorialMovimientos() {
                     {h.observaciones && (
                       <div className="text-xs mt-1 inline-block bg-champagne text-primario px-2 py-0.5 rounded">{h.observaciones}</div>
                     )}
+                    {cambios.length === 0 && !h.observaciones && (
+                      <div className="text-xs mt-1 text-texto-sec italic">Sin detalle registrado para este movimiento.</div>
+                    )}
                   </div>
                 );
               })}

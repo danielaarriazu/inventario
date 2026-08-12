@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDestino from '../components/ModalNuevoDestino';
-import { Shield, PlusCircle, Users, LogOut, LayoutDashboard, Menu as MenuIcon, Monitor } from 'lucide-react';
+import { PlusCircle, Users, LogOut, LayoutDashboard, Menu as MenuIcon, Monitor } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 
 interface Destino {
