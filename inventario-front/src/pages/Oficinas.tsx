@@ -15,10 +15,12 @@ export default function Oficinas() {
   const nombreDivision = (location.state as { nombreDivision?: string })?.nombreDivision || 'División';
 
   const [oficinas, setOficinas] = useState<Oficina[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchOficinas = async () => {
+    setCargando(true);
     try {
       const response = await api.get(`/oficinas?id_division=${idDivision}`);
       setOficinas(response.data);
@@ -28,6 +30,8 @@ export default function Oficinas() {
       } else {
         console.error('Error al obtener las oficinas', error);
       }
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -73,7 +77,11 @@ export default function Oficinas() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {oficinas.length === 0 ? (
+          {cargando ? (
+            <div className="col-span-full bg-superficie p-10 rounded-xl border border-borde text-center text-texto-sec text-sm font-medium">
+              Cargando oficinas...
+            </div>
+          ) : oficinas.length === 0 ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border-2 border-dashed border-borde text-center">
               <p className="text-texto-sec font-medium text-sm">
                 Todavía no hay oficinas cargadas en esta división.

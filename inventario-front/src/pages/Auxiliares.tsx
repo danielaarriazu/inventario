@@ -19,11 +19,13 @@ export default function Auxiliares() {
   const [auxiliares, setAuxiliares] = useState<Auxiliar[]>([]);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [resetObjetivo, setResetObjetivo] = useState<Auxiliar | null>(null);
   const navigate = useNavigate();
 
   const fetchAuxiliares = async () => {
+    setCargando(true);
     try {
       const response = await api.get('/auth/companeros');
       setAuxiliares(response.data);
@@ -33,6 +35,8 @@ export default function Auxiliares() {
       } else {
         console.error('Error al obtener los auxiliares', error);
       }
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -107,7 +111,11 @@ export default function Auxiliares() {
 
         {/* Tabla */}
         <div className="bg-superficie border border-borde rounded-xl shadow-sm overflow-hidden">
-          {auxiliares.length === 0 ? (
+          {cargando ? (
+            <div className="p-12 text-center text-texto-sec text-sm font-medium">
+              Cargando auxiliares...
+            </div>
+          ) : auxiliares.length === 0 ? (
             <div className="p-12 text-center">
               <ShieldAlert className="w-10 h-10 text-texto-sec/50 mx-auto mb-4" />
               <p className="text-texto-sec text-sm font-semibold">

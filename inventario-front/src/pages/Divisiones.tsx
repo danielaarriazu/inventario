@@ -16,10 +16,12 @@ export default function Divisiones() {
   const nombreDepartamento = (location.state as { nombreDepartamento?: string })?.nombreDepartamento || 'Departamento';
 
   const [divisiones, setDivisiones] = useState<Division[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDivisiones = async () => {
+    setCargando(true);
     try {
       const response = await api.get(`/divisiones?id_departamento=${idDepartamento}`);
       setDivisiones(response.data);
@@ -29,6 +31,8 @@ export default function Divisiones() {
       } else {
         console.error('Error al obtener las divisiones', error);
       }
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -74,7 +78,11 @@ export default function Divisiones() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {divisiones.length === 0 ? (
+          {cargando ? (
+            <div className="col-span-full bg-superficie p-10 rounded-xl border border-borde text-center text-texto-sec text-sm font-medium">
+              Cargando divisiones...
+            </div>
+          ) : divisiones.length === 0 ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border-2 border-dashed border-borde text-center">
               <p className="text-texto-sec font-medium text-sm">
                 Todavía no hay divisiones cargadas en este departamento.

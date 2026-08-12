@@ -41,6 +41,7 @@ export default function Equipos() {
   const [filtroEstado, setFiltroEstado] = useState<'TODOS' | 'ACTIVO' | 'REPARACION' | 'BAJA'>('TODOS');
   const [filtroConexion, setFiltroConexion] = useState<typeof CONEXIONES[number]>('TODAS');
   const [descargando, setDescargando] = useState(false);
+  const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -50,12 +51,15 @@ export default function Equipos() {
   const numeroOficina = (location.state as { numeroOficina?: string })?.numeroOficina;
 
   const fetchEquipos = async () => {
+    setCargando(true);
     try {
       const url = idOficina ? `/equipos?id_oficina=${idOficina}` : '/equipos';
       const response = await api.get(url);
       setEquipos(response.data);
     } catch (error: any) {
       if (error.response?.status === 401 || error.response?.status === 403) navigate('/');
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -175,7 +179,11 @@ export default function Equipos() {
         </div>
 
         <div className="bg-superficie border border-borde rounded-xl shadow-sm overflow-hidden">
-          {equiposFiltrados.length === 0 ? (
+          {cargando ? (
+            <div className="p-12 text-center text-texto-sec text-sm font-medium">
+              Cargando equipos...
+            </div>
+          ) : equiposFiltrados.length === 0 ? (
             <div className="p-12 text-center text-texto-sec text-sm font-medium">
               No se encontraron equipos con esos criterios.
             </div>

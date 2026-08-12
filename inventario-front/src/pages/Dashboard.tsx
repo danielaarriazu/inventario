@@ -21,10 +21,12 @@ export default function Dashboard() {
   const [destinos, setDestinos] = useState<Destino[]>([]);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDestinos = async () => {
+    setCargando(true);
     try {
       const response = await api.get('/destinos');
       setDestinos(response.data);
@@ -35,6 +37,8 @@ export default function Dashboard() {
       } else {
         console.error('Error al obtener los destinos', error);
       }
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -131,7 +135,11 @@ export default function Dashboard() {
 
         {/* Grilla de Destinos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {destinos.length === 0 ? (
+          {cargando ? (
+            <div className="col-span-full bg-superficie p-10 rounded-xl border border-borde text-center text-texto-sec text-sm font-medium">
+              Cargando destinos...
+            </div>
+          ) : destinos.length === 0 ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border-2 border-dashed border-borde text-center">
               <div className="w-12 h-12 bg-fondo text-texto-sec rounded-full flex items-center justify-center mx-auto mb-4 border border-borde">⚓</div>
               <p className="text-texto-sec font-medium text-sm">

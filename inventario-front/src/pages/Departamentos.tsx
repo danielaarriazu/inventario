@@ -16,10 +16,12 @@ export default function Departamentos() {
   const nombreDestino = (location.state as { nombreDestino?: string })?.nombreDestino || 'Destino';
 
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDepartamentos = async () => {
+    setCargando(true);
     try {
       const response = await api.get(`/departamentos?id_destino=${idDestino}`);
       setDepartamentos(response.data);
@@ -29,6 +31,8 @@ export default function Departamentos() {
       } else {
         console.error('Error al obtener los departamentos', error);
       }
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -74,7 +78,11 @@ export default function Departamentos() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {departamentos.length === 0 ? (
+          {cargando ? (
+            <div className="col-span-full bg-superficie p-10 rounded-xl border border-borde text-center text-texto-sec text-sm font-medium">
+              Cargando departamentos...
+            </div>
+          ) : departamentos.length === 0 ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border-2 border-dashed border-borde text-center">
               <p className="text-texto-sec font-medium text-sm">
                 Todavía no hay departamentos cargados en este destino.
