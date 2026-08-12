@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut, KeyRound, FileText } from 'lucide-react';
+import { X, Home, LayoutDashboard, Monitor, Users, Wrench, LogOut, KeyRound, FileText, History } from 'lucide-react';
 import ModalCambiarPassword from './ModalCambiarPassword';
 import ModalEncabezado from './ModalEncabezado';
 
@@ -14,6 +14,7 @@ const ITEMS_BASE = [
   { path: '/menu', label: 'Menú Principal', icon: Home },
   { path: '/dashboard', label: 'Administrar (Destinos)', icon: LayoutDashboard },
   { path: '/dashboard/equipos', label: 'Equipos', icon: Monitor },
+  { path: '/dashboard/historial', label: 'Historial de Movimientos', icon: History },
   { path: '/movimientos', label: 'Movimientos', icon: Wrench },
 ];
 const ITEM_AUXILIARES = { path: '/dashboard/auxiliares', label: 'Auxiliares', icon: Users };
@@ -32,7 +33,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   }, []);
 
   const items = esResponsable
-    ? [...ITEMS_BASE.slice(0, 3), ITEM_AUXILIARES, ITEMS_BASE[3]]
+    ? [...ITEMS_BASE.slice(0, 3), ITEM_AUXILIARES, ...ITEMS_BASE.slice(3)]
     : ITEMS_BASE;
 
   const handleLogout = () => {

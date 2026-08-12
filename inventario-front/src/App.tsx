@@ -13,6 +13,7 @@ import AltaPlanilla from './pages/AltaPlanilla';
 import Ficha from './pages/Ficha';
 import ImprimirFicha from './pages/ImprimirFicha';
 import ImprimirOficina from './pages/ImprimirOficina';
+import HistorialMovimientos from './pages/HistorialMovimientos';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/equipos/:id" element={<Ficha />} />
           <Route path="/equipos/:id/imprimir" element={<ImprimirFicha />} />
           <Route path="/dashboard/oficinas/:idOficina/imprimir" element={<ImprimirOficina />} />
+          <Route path="/dashboard/historial" element={<HistorialMovimientos />} />
         </Routes>
       </div>
     </BrowserRouter>

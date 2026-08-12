@@ -72,9 +72,7 @@ export default function Dashboard() {
           >
             <MenuIcon className="w-5 h-5" />
           </button>
-          <div className="bg-white/10 p-2 rounded-lg">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
+         
           <div>
             <h1 className="text-lg font-bold text-white tracking-wide">
               Sistema de Inventario
