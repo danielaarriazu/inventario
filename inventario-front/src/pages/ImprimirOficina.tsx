@@ -127,7 +127,7 @@ export default function ImprimirOficina() {
                       <tr>
                         <td rowSpan={5} className={celdaVertical}>I<br />N<br />F<br />O</td>
                         <td className={filaSeccion}>N° DE EQUIPO</td>
-                        <td className={filaValor}>{equipo.numero_equipo}</td>
+                        <td className={filaValor}>{equipo.nombre_equipo}</td>
                       </tr>
                       <tr>
                         <td className={filaSeccion}>OFICINA</td>
@@ -139,7 +139,7 @@ export default function ImprimirOficina() {
                       </tr>
                       <tr>
                         <td className={filaSeccion}>NOMBRE DE EQUIPO</td>
-                        <td className={filaValor}>{equipo.nombre_equipo}</td>
+                        <td className={filaValor}>{equipo.numero_equipo}</td>
                       </tr>
                       <tr>
                         <td className={filaSeccion}>NOMBRE DE USUARIO</td>
