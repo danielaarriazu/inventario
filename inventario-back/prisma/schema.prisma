@@ -69,8 +69,13 @@ model Cargo {
   nombre_cargo String    
   estado       Boolean   @default(true) 
 
+   // Encabezado de la planilla de consignación — las 5 líneas, todas editables
+  encabezado_linea1  String @default("DIVISION INFORMATICA")
   encabezado_destino String @default("SECRETARIA GENERAL DE LA ARMADA")
+  encabezado_linea3  String @default("CARGO DE INFORMATICA")
+  encabezado_titulo  String @default("PLANILLA DE CONSIGNACION INTERNA DE EQUIPOS INFORMATICOS")
   encabezado_anio    String @default("2026")
+
 
   usuarios     Usuario[] 
   destinos     Destino[] 

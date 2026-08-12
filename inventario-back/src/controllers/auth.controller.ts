@@ -59,7 +59,7 @@ export const registrarAuxiliar = async (req: Request, res: Response): Promise<vo
         mr,
         nombre_apellido: nombre,
         password: passwordHasheada,
-        rol, // RESPONSABLE o SUBORDINADO
+        rol, // RESPONSABLE o AUXILIAR
         jerarquia,
         id_cargo // Se vincula automáticamente a tu mismo cargo
       }

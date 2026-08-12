@@ -7,10 +7,13 @@ interface Props {
   onClose: () => void;
 }
 
-// Solo el Responsable la usa, para configurar Destino y Año — el resto
-// del encabezado de la planilla queda fijo
+// Solo el Responsable la usa — acá se configuran las 5 líneas del
+// encabezado de la planilla, tal como salen impresas
 export default function ModalEncabezado({ isOpen, onClose }: Props) {
+  const [linea1, setLinea1] = useState('');
   const [destino, setDestino] = useState('');
+  const [linea3, setLinea3] = useState('');
+  const [titulo, setTitulo] = useState('');
   const [anio, setAnio] = useState('');
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -20,7 +23,10 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
     if (!isOpen) return;
     setError(''); setMensaje('');
     api.get('/cargo/encabezado').then(res => {
+      setLinea1(res.data.encabezado_linea1);
       setDestino(res.data.encabezado_destino);
+      setLinea3(res.data.encabezado_linea3);
+      setTitulo(res.data.encabezado_titulo);
       setAnio(res.data.encabezado_anio);
     }).catch(() => {});
   }, [isOpen]);
@@ -32,7 +38,13 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
     setError(''); setMensaje('');
     setGuardando(true);
     try {
-      await api.put('/cargo/encabezado', { encabezado_destino: destino, encabezado_anio: anio });
+      await api.put('/cargo/encabezado', {
+        encabezado_linea1: linea1,
+        encabezado_destino: destino,
+        encabezado_linea3: linea3,
+        encabezado_titulo: titulo,
+        encabezado_anio: anio,
+      });
       setMensaje('Encabezado actualizado correctamente.');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al guardar el encabezado');
@@ -41,10 +53,13 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
     }
   };
 
+  const inputClass = "w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento";
+  const labelClass = "text-xs font-bold text-texto-sec uppercase tracking-wide";
+
   return (
     <div className="fixed inset-0 z-[60] bg-primario/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-superficie border border-borde rounded-xl max-w-sm w-full shadow-xl overflow-hidden">
-        <div className="bg-fondo p-4 border-b border-borde flex justify-between items-center">
+      <div className="bg-superficie border border-borde rounded-xl max-w-sm w-full shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="bg-fondo p-4 border-b border-borde flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-2 text-sm font-bold text-primario">
             <FileText className="w-4 h-4" /> Encabezado de la planilla
           </div>
@@ -53,31 +68,37 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-3 overflow-y-auto">
           {mensaje && <div className="bg-activo/10 border border-activo/30 text-activo p-2.5 rounded text-xs font-semibold">{mensaje}</div>}
           {error && <div className="bg-baja/10 border border-baja/30 text-baja p-2.5 rounded text-xs font-medium">{error}</div>}
 
-          <div className="bg-fondo border border-borde rounded-lg p-3 text-center text-[10.5px] text-texto-sec leading-relaxed">
-            DIVISION INFORMATICA<br />
+          <div className="bg-fondo border border-borde rounded-lg p-3 text-center text-[10px] text-texto-sec leading-relaxed">
+            {linea1 || '...'}<br />
             <b className="text-tinta">{destino || '...'}</b><br />
-            CARGO DE INFORMATICA<br />
-            PLANILLA DE CONSIGNACION INTERNA DE EQUIPOS INFORMATICOS<br />
+            {linea3 || '...'}<br />
+            {titulo || '...'}<br />
             AÑO {anio || '...'}
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Destino</label>
-            <input
-              required value={destino} onChange={e => setDestino(e.target.value)}
-              className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
-            />
+            <label className={labelClass}>Línea 1</label>
+            <input required value={linea1} onChange={e => setLinea1(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Año</label>
-            <input
-              required value={anio} onChange={e => setAnio(e.target.value)}
-              className="w-full border border-borde rounded p-2.5 text-sm text-tinta focus:outline-none focus:ring-2 focus:ring-acento"
-            />
+            <label className={labelClass}>Destino</label>
+            <input required value={destino} onChange={e => setDestino(e.target.value)} className={inputClass} />
+          </div>
+          <div className="space-y-1">
+            <label className={labelClass}>Línea 3 (Cargo)</label>
+            <input required value={linea3} onChange={e => setLinea3(e.target.value)} className={inputClass} />
+          </div>
+          <div className="space-y-1">
+            <label className={labelClass}>Título de la planilla</label>
+            <input required value={titulo} onChange={e => setTitulo(e.target.value)} className={inputClass} />
+          </div>
+          <div className="space-y-1">
+            <label className={labelClass}>Año</label>
+            <input required value={anio} onChange={e => setAnio(e.target.value)} className={inputClass} />
           </div>
 
           <button

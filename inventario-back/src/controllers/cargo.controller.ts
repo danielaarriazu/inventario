@@ -14,12 +14,19 @@ export const getEncabezado = async (req: Request, res: Response) => {
 // PUT /api/cargo/encabezado -> solo el Responsable lo puede configurar
 export const updateEncabezado = async (req: Request, res: Response) => {
   try {
-    const { encabezado_destino, encabezado_anio } = req.body;
-    if (!encabezado_destino || !encabezado_anio) {
-      res.status(400).json({ error: 'Completá el destino y el año' });
+    const { encabezado_linea1, encabezado_destino, encabezado_linea3, encabezado_titulo, encabezado_anio } = req.body;
+    if (!encabezado_linea1 || !encabezado_destino || !encabezado_linea3 || !encabezado_titulo || !encabezado_anio) {
+      res.status(400).json({ error: 'Completá las 5 líneas del encabezado' });
       return;
     }
-    const actualizado = await cargoService.actualizarEncabezado(req.usuario!.id_cargo, encabezado_destino, encabezado_anio);
+    const actualizado = await cargoService.actualizarEncabezado(
+      req.usuario!.id_cargo,
+      encabezado_linea1,
+      encabezado_destino,
+      encabezado_linea3,
+      encabezado_titulo,
+      encabezado_anio
+    );
     res.status(200).json(actualizado);
   } catch (error: any) {
     res.status(400).json({ error: error.message || 'Error al actualizar el encabezado' });
