@@ -57,16 +57,19 @@ export default function ImprimirFicha() {
   const [equipo, setEquipo] = useState<any>(null);
   const [historial, setHistorial] = useState<any[]>([]);
   const [encabezado, setEncabezado] = useState<any>(null);
+  const [qrImage, setQrImage] = useState('');
 
   useEffect(() => {
     Promise.all([
       api.get(`/equipos/${id}`),
       api.get(`/auditoria/equipo/${id}`),
       api.get('/cargo/encabezado'),
-    ]).then(([eq, hist, enc]) => {
+      api.get(`/equipos/${id}/qr`),
+    ]).then(([eq, hist, enc, qr]) => {
       setEquipo(eq.data);
       setHistorial(hist.data);
       setEncabezado(enc.data);
+      setQrImage(qr.data.qr_image);
     }).catch((err: any) => {
       if (err.response?.status === 401 || err.response?.status === 403) navigate('/');
     });
@@ -104,7 +107,14 @@ export default function ImprimirFicha() {
       <div className="max-w-2xl mx-auto bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none">
         <EncabezadoImpreso {...props} />
 
-        <table className="w-full border-collapse">
+        <div className="relative">
+          {qrImage && (
+            <div className="absolute top-20 right-0 text-center z-10">
+              <img src={qrImage} alt="QR del equipo" className="w-16 h-16" />
+              <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
+            </div>
+          )}
+          <table className="w-full border-collapse">
           <tbody>
             {/* INFO */}
             <tr>
@@ -203,6 +213,7 @@ export default function ImprimirFicha() {
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Hoja 2 — historial de reparaciones, para imprimir a doble faz */}

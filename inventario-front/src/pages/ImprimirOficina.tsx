@@ -60,6 +60,7 @@ export default function ImprimirOficina() {
 
   const [equipos, setEquipos] = useState<any[]>([]);
   const [historiales, setHistoriales] = useState<Record<number, any[]>>({});
+  const [qrImages, setQrImages] = useState<Record<number, string>>({});
   const [encabezado, setEncabezado] = useState<any>(null);
   const [cargando, setCargando] = useState(true);
 
@@ -74,11 +75,17 @@ export default function ImprimirOficina() {
         setEncabezado(encRes.data);
 
         const historiasPorEquipo: Record<number, any[]> = {};
+        const qrsPorEquipo: Record<number, string> = {};
         await Promise.all(eqRes.data.map(async (eq: any) => {
-          const h = await api.get(`/auditoria/equipo/${eq.id_planilla}`);
+          const [h, qr] = await Promise.all([
+            api.get(`/auditoria/equipo/${eq.id_planilla}`),
+            api.get(`/equipos/${eq.id_planilla}/qr`),
+          ]);
           historiasPorEquipo[eq.id_planilla] = h.data.filter((x: any) => x.tipo_accion === 'REPARACION');
+          qrsPorEquipo[eq.id_planilla] = qr.data.qr_image;
         }));
         setHistoriales(historiasPorEquipo);
+        setQrImages(qrsPorEquipo);
       } catch (err: any) {
         if (err.response?.status === 401 || err.response?.status === 403) navigate('/');
       } finally {
@@ -122,7 +129,14 @@ export default function ImprimirOficina() {
                 {/* Hoja de datos del equipo */}
                 <div className={`bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none ${i > 0 ? 'print:break-before-page' : ''}`}>
                   <EncabezadoImpreso {...props} />
-                  <table className="w-full border-collapse">
+                  <div className="relative">
+                    {qrImages[equipo.id_planilla] && (
+                      <div className="absolute top-20 right-0 text-center z-10">
+                        <img src={qrImages[equipo.id_planilla]} alt="QR del equipo" className="w-16 h-16" />
+                        <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
+                      </div>
+                    )}
+                    <table className="w-full border-collapse">
                     <tbody>
                       <tr>
                         <td rowSpan={5} className={celdaVertical}>I<br />N<br />F<br />O</td>
@@ -218,6 +232,7 @@ export default function ImprimirOficina() {
                       </tr>
                     </tbody>
                   </table>
+                  </div>
                 </div>
 
                 {/* Hoja de historial de reparaciones — así queda pareja para doble faz */}
