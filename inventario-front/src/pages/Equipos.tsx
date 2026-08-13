@@ -104,7 +104,7 @@ export default function Equipos() {
           <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
             <MenuIcon className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario Patrimonial</h1>
+          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario</h1>
         </div>
       </nav>
 
