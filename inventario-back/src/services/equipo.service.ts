@@ -111,6 +111,10 @@ export const actualizarEquipo = async (
     throw new Error('Equipo no encontrado');
   }
 
+  if (equipoViejo.estado_equipo === 'BAJA') {
+    throw new Error('Este equipo está dado de baja y no se puede modificar');
+  }
+
   const cambiosRealizados: any = {};
   for (const key in data) {
     if (data[key] !== (equipoViejo as any)[key]) {
@@ -206,6 +210,10 @@ export const registrarMovimiento = async (
 
   if (!equipoViejo) {
     throw new Error('Equipo no encontrado');
+  }
+
+  if (equipoViejo.estado_equipo === 'BAJA') {
+    throw new Error('Este equipo está dado de baja — no se pueden registrar más movimientos');
   }
 
   if (!ETIQUETAS_TIPO_ACCION[tipo_accion]) {

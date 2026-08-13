@@ -242,11 +242,12 @@ export default function Ficha() {
                 <Printer className="w-4 h-4" /> Imprimir
               </button>
             )}
-            {!editando ? (
+            {!editando && equipo.estado_equipo !== 'BAJA' && (
               <button onClick={() => setEditando(true)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
                 <Pencil className="w-4 h-4" /> Editar
               </button>
-            ) : (
+            )}
+            {editando && (
               <button onClick={cancelarEdicion} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
                 <X className="w-4 h-4" /> Cancelar
               </button>

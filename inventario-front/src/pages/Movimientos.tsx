@@ -295,6 +295,9 @@ export default function Movimientos() {
                       {equipoSeleccionado.estado_equipo === 'REPARACION' && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-reparacion text-white">🔧 EN REPARACIÓN</span>
                       )}
+                      {equipoSeleccionado.estado_equipo === 'BAJA' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-baja text-white">⛔ DADO DE BAJA</span>
+                      )}
                     </div>
                     <div className="text-xs text-texto-sec">
                       {equipoSeleccionado.usuario_responsable} · Oficina {equipoSeleccionado.oficina?.numero_oficina}
@@ -318,6 +321,11 @@ export default function Movimientos() {
                 {equipoSeleccionado.estado_equipo === 'REPARACION' && (
                   <p className="text-[11px] text-texto-sec mt-2">
                     Vuelve a Activo solo cuando guardes una Reparación o un Mantenimiento Preventivo sobre este equipo.
+                  </p>
+                )}
+                {equipoSeleccionado.estado_equipo === 'BAJA' && (
+                  <p className="text-[11px] text-baja font-semibold mt-2">
+                    Este equipo está dado de baja — no se pueden registrar movimientos.
                   </p>
                 )}
               </div>
@@ -359,7 +367,9 @@ export default function Movimientos() {
             )}
           </div>
 
-          {/* 2. Tipo de acción */}
+          {/* 2. Tipo de acción (y todo lo demás) — oculto si el equipo está dado de baja */}
+          {equipoSeleccionado?.estado_equipo !== 'BAJA' && (
+          <>
           <div>
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Tipo de acción</label>
             <div className="flex flex-wrap gap-2 mt-1.5">
@@ -538,6 +548,8 @@ export default function Movimientos() {
           >
             {enviando ? 'Guardando...' : 'Guardar movimiento'}
           </button>
+          </>
+          )}
         </form>
       </main>
 
