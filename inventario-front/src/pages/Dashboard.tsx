@@ -31,7 +31,6 @@ export default function Dashboard() {
       const response = await api.get('/destinos');
       setDestinos(response.data);
     } catch (error: any) {
-      // Solo te saca al login si la sesión realmente venció o es inválida
       if (error.response?.status === 401 || error.response?.status === 403) {
         navigate('/');
       } else {
@@ -72,7 +71,7 @@ export default function Dashboard() {
           >
             <MenuIcon className="w-5 h-5" />
           </button>
-         
+          
           <div>
             <h1 className="text-lg font-bold text-white tracking-wide">
               Sistema de Inventario
@@ -80,18 +79,18 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Sección Derecha: Usuario y Salir modificado a tu diseño */}
+        <div className="flex items-center gap-3">
           {perfil && (
-            <div className="hidden md:flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
-              {perfil.nombre_apellido} · MR {perfil.mr}
+            <div className="hidden md:flex bg-slate-800 border border-slate-700 text-white text-sm font-semibold px-4 py-1.5 rounded-md items-center shadow-sm">
+              {perfil.nombre_apellido} • MR {perfil.mr}
             </div>
           )}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-baja/20 hover:bg-baja/30 text-white border border-baja/40 text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center gap-2 bg-[#2a1b1b] hover:bg-red-950 border border-red-900/50 text-white text-sm font-semibold px-4 py-1.5 rounded-md transition-colors cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
-            Salir
+            <LogOut className="w-4 h-4" /> Salir
           </button>
         </div>
       </nav>

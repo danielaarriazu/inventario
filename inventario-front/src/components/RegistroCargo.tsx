@@ -28,7 +28,7 @@ export default function RegistroCargo() {
 
     try {
       await api.post('/auth/registrar-cargo', formData);
-      setMensaje('Cargo y Responsable creados exitosamente.');
+      setMensaje('Cargo y Encargado creados exitosamente.');
       setTimeout(() => navigate('/'), 2000);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Ocurrió un error al registrar el cargo');
@@ -42,7 +42,7 @@ export default function RegistroCargo() {
         <div className="text-center mb-6">
           <div className="text-2xl mb-1">⚓</div>
           <h2 className="text-xl font-bold text-primario">Alta de Nuevo Cargo</h2>
-          <p className="text-sm text-texto-sec mt-1">Configure el cargo y el responsable</p>
+          <p className="text-sm text-texto-sec mt-1">Configure el cargo y el encargado</p>
         </div>
 
         {mensaje && <div className="p-3 bg-activo/10 text-activo border border-activo/30 rounded text-sm text-center font-semibold">{mensaje}</div>}

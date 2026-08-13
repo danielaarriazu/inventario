@@ -241,6 +241,17 @@ export const registrarMovimiento = async (
     detalleCambios.estado_equipo = { antes: equipoViejo.estado_equipo, despues: 'BAJA' };
   }
 
+  // Si el equipo estaba "En Reparación" (lo marcaron cuando se lo llevaron al
+  // taller) y ahora se guarda una Reparación o un Mantenimiento Preventivo,
+  // interpretamos que ya se solucionó y se le devuelve al usuario — vuelve solo a Activo
+  if (
+    (tipo_accion === 'REPARACION' || tipo_accion === 'MANTENIMIENTO_PREVENTIVO') &&
+    equipoViejo.estado_equipo === 'REPARACION'
+  ) {
+    dataEquipo.estado_equipo = 'ACTIVO';
+    detalleCambios.estado_equipo = { antes: 'REPARACION', despues: 'ACTIVO' };
+  }
+
   // Si vino algún cambio de componente (típicamente en una Reparación: se
   // cambió la RAM, el disco, etc.), lo aplicamos a la planilla real y
   // dejamos el antes/después asentado en el historial junto con todo lo demás
@@ -269,6 +280,43 @@ export const registrarMovimiento = async (
         observaciones,
         motivo_cambio: ETIQUETAS_TIPO_ACCION[tipo_accion],
         detalle_cambios: JSON.stringify(detalleCambios)
+      }
+    });
+
+    return { equipo: equipoActualizado, historial };
+  });
+
+  return resultado;
+};
+
+// Marca un equipo como "En Reparación" (fuera de servicio) — típicamente
+// cuando se lo lleva al taller. Se destilda solo cuando después se guarda
+// una Reparación o un Mantenimiento Preventivo sobre ese mismo equipo.
+export const marcarEnReparacion = async (id_planilla: number, id_usuario: number) => {
+  const equipoViejo = await prisma.planilla_Equipo.findUnique({ where: { id_planilla } });
+  if (!equipoViejo) throw new Error('Equipo no encontrado');
+  if (equipoViejo.estado_equipo === 'REPARACION') {
+    throw new Error('El equipo ya está marcado en reparación');
+  }
+  if (equipoViejo.estado_equipo === 'BAJA') {
+    throw new Error('El equipo está dado de baja, no se puede marcar en reparación');
+  }
+
+  const resultado = await prisma.$transaction(async (tx) => {
+    const equipoActualizado = await tx.planilla_Equipo.update({
+      where: { id_planilla },
+      data: { estado_equipo: 'REPARACION' }
+    });
+
+    const historial = await tx.historial_Modificacion.create({
+      data: {
+        id_planilla,
+        id_usuario,
+        tipo_accion: null,
+        motivo_cambio: 'Equipo enviado a reparación',
+        detalle_cambios: JSON.stringify({
+          estado_equipo: { antes: equipoViejo.estado_equipo, despues: 'REPARACION' }
+        })
       }
     });
 

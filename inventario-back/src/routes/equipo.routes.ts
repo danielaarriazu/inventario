@@ -6,7 +6,8 @@ import {
   updateEquipo, 
   softDeleteEquipo,
   getEquipoQR,
-  registrarMovimiento
+  registrarMovimiento,
+  marcarEnReparacion
 } from '../controllers/equipo.controller';
 import { verificarToken, soloResponsable } from '../middlewares/auth.middleware';
 
@@ -17,6 +18,7 @@ router.get('/:id', verificarToken, getEquipoById);
 router.get('/:id/qr', verificarToken, getEquipoQR);
 router.post('/', verificarToken, createEquipo);
 router.post('/:id/movimiento', verificarToken, registrarMovimiento);
+router.put('/:id/en-reparacion', verificarToken, marcarEnReparacion);
 router.put('/:id', verificarToken, updateEquipo);
 router.delete('/:id', verificarToken, soloResponsable, softDeleteEquipo);
 

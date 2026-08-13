@@ -24,6 +24,7 @@ interface Equipo {
   tiene_teclado: boolean;
   tiene_mouse: boolean;
   perifericos_otros: string | null;
+  estado_equipo: 'ACTIVO' | 'REPARACION' | 'BAJA';
   oficina?: { numero_oficina: string };
 }
 interface Perfil { nombre_apellido: string; mr: string; }
@@ -55,6 +56,7 @@ export default function Movimientos() {
   const [busqueda, setBusqueda] = useState('');
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo | null>(null);
   const [escaneando, setEscaneando] = useState(false);
+  const [marcandoReparacion, setMarcandoReparacion] = useState(false);
 
   // Tipo de acción
   const [tipoAccion, setTipoAccion] = useState('');
@@ -148,6 +150,22 @@ export default function Movimientos() {
     setHardwareOtros(aLista(eq.hardware_otros));
     setPerifericosOtros(aLista(eq.perifericos_otros));
     setCambioComponentes(false);
+  };
+
+  const handleMarcarEnReparacion = async () => {
+    if (!equipoSeleccionado) return;
+    setMarcandoReparacion(true);
+    setError('');
+    try {
+      await api.put(`/equipos/${equipoSeleccionado.id_planilla}/en-reparacion`);
+      const actualizado = { ...equipoSeleccionado, estado_equipo: 'REPARACION' as const };
+      setEquipoSeleccionado(actualizado);
+      setEquipos(prev => prev.map(eq => eq.id_planilla === actualizado.id_planilla ? actualizado : eq));
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Error al marcar el equipo en reparación');
+    } finally {
+      setMarcandoReparacion(false);
+    }
   };
 
   const resetForm = () => {
@@ -286,16 +304,39 @@ export default function Movimientos() {
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">Equipo</label>
 
             {equipoSeleccionado ? (
-              <div className="mt-1 flex items-center justify-between bg-superficie border border-acento/40 rounded-lg p-3">
-                <div>
-                  <div className="font-bold text-sm text-primario">{equipoSeleccionado.numero_equipo}</div>
-                  <div className="text-xs text-texto-sec">
-                    {equipoSeleccionado.usuario_responsable} · Oficina {equipoSeleccionado.oficina?.numero_oficina}
+              <div className="mt-1 bg-superficie border border-acento/40 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-primario">{equipoSeleccionado.numero_equipo}</span>
+                      {equipoSeleccionado.estado_equipo === 'REPARACION' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-reparacion text-white">🔧 EN REPARACIÓN</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-texto-sec">
+                      {equipoSeleccionado.usuario_responsable} · Oficina {equipoSeleccionado.oficina?.numero_oficina}
+                    </div>
                   </div>
+                  <button type="button" onClick={() => setEquipoSeleccionado(null)} className="text-texto-sec hover:text-baja cursor-pointer">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-                <button type="button" onClick={() => setEquipoSeleccionado(null)} className="text-texto-sec hover:text-baja cursor-pointer">
-                  <X className="w-4 h-4" />
-                </button>
+
+                {equipoSeleccionado.estado_equipo === 'ACTIVO' && (
+                  <button
+                    type="button"
+                    onClick={handleMarcarEnReparacion}
+                    disabled={marcandoReparacion}
+                    className="w-full mt-2.5 flex items-center justify-center gap-1.5 bg-reparacion/10 hover:bg-reparacion/20 text-reparacion font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    <Wrench className="w-3.5 h-3.5" /> {marcandoReparacion ? 'Marcando...' : 'Se lleva a reparar (marcar fuera de servicio)'}
+                  </button>
+                )}
+                {equipoSeleccionado.estado_equipo === 'REPARACION' && (
+                  <p className="text-[11px] text-texto-sec mt-2">
+                    Vuelve a Activo solo cuando guardes una Reparación o un Mantenimiento Preventivo sobre este equipo.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="mt-1 space-y-2">

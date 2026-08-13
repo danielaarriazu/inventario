@@ -121,3 +121,18 @@ export const registrarMovimiento = async (req: Request, res: Response): Promise<
     res.status(400).json({ error: error.message || 'Error al registrar el movimiento' });
   }
 };
+
+// PUT /api/equipos/:id/en-reparacion -> lo marca fuera de servicio (se lo llevaron al taller)
+export const marcarEnReparacion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id_planilla = parseInt(req.params.id as string, 10);
+    if (isNaN(id_planilla)) {
+      res.status(400).json({ error: 'El ID proporcionado no es válido' });
+      return;
+    }
+    const resultado = await equipoService.marcarEnReparacion(id_planilla, req.usuario!.id_usuario);
+    res.status(200).json(resultado);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Error al marcar el equipo en reparación' });
+  }
+};
