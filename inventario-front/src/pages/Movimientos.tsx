@@ -207,8 +207,8 @@ export default function Movimientos() {
     if (!equipoSeleccionado) { setError('Elegí un equipo'); return; }
     if (!tipoAccion) { setError('Elegí el tipo de acción'); return; }
     if (tipoAccion === 'TRASPASO' && !selOficina) { setError('Elegí la oficina destino'); return; }
-    if (tipoAccion === 'REPARACION' && !observaciones.trim()) {
-      setError('Contá en Observaciones qué se hizo en la reparación');
+    if (!observaciones.trim()) {
+      setError('Contá en Observaciones qué se hizo');
       return;
     }
 
@@ -312,7 +312,7 @@ export default function Movimientos() {
                     disabled={marcandoReparacion}
                     className="w-full mt-2.5 flex items-center justify-center gap-1.5 bg-reparacion/10 hover:bg-reparacion/20 text-reparacion font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-60"
                   >
-                    <Wrench className="w-3.5 h-3.5" /> {marcandoReparacion ? 'Marcando...' : 'Se lleva a reparar (marcar fuera de servicio)'}
+                    <Wrench className="w-3.5 h-3.5" /> {marcandoReparacion ? 'Marcando...' : 'Se lleva a reparar'}
                   </button>
                 )}
                 {equipoSeleccionado.estado_equipo === 'REPARACION' && (
@@ -520,7 +520,7 @@ export default function Movimientos() {
           {/* 4. Observaciones */}
           <div>
             <label className="text-xs font-bold text-texto-sec uppercase tracking-wide">
-              Observaciones{tipoAccion === 'REPARACION' && <span className="text-baja"> * </span>}
+              Observaciones <span className="text-baja">*</span>
             </label>
             <textarea
               rows={3}
