@@ -19,6 +19,10 @@ export const updateEncabezado = async (req: Request, res: Response) => {
       res.status(400).json({ error: 'Completá las 5 líneas del encabezado' });
       return;
     }
+    if (!/^\d{4}$/.test(encabezado_anio)) {
+      res.status(400).json({ error: 'El año tiene que ser un número de 4 dígitos' });
+      return;
+    }
     const actualizado = await cargoService.actualizarEncabezado(
       req.usuario!.id_cargo,
       encabezado_linea1,

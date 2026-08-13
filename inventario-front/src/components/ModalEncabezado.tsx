@@ -115,7 +115,14 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
           </div>
           <div className="space-y-1">
             <label className={labelClass}>Año <span className="text-baja">*</span></label>
-            <input required value={anio} onChange={e => setAnio(e.target.value)} className={inputClass} />
+            <input
+              required
+              inputMode="numeric"
+              maxLength={4}
+              value={anio}
+              onChange={e => setAnio(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              className={inputClass}
+            />
           </div>
 
           <button

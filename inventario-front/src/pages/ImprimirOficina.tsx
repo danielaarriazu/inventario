@@ -127,15 +127,15 @@ export default function ImprimirOficina() {
             return (
               <div key={equipo.id_planilla}>
                 {/* Hoja de datos del equipo */}
-                <div className={`bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none ${i > 0 ? 'print:break-before-page' : ''}`}>
+                <div className={`bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none relative ${i > 0 ? 'print:break-before-page' : ''}`}>
+                  {qrImages[equipo.id_planilla] && (
+                    <div className="absolute top-8 right-8 print:top-0 print:right-0 text-center">
+                      <img src={qrImages[equipo.id_planilla]} alt="QR del equipo" className="w-16 h-16" />
+                      <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
+                    </div>
+                  )}
                   <EncabezadoImpreso {...props} />
-                  <div className="relative">
-                    {qrImages[equipo.id_planilla] && (
-                      <div className="absolute top-20 right-0 text-center z-10">
-                        <img src={qrImages[equipo.id_planilla]} alt="QR del equipo" className="w-16 h-16" />
-                        <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
-                      </div>
-                    )}
+                  <div>
                     <table className="w-full border-collapse">
                     <tbody>
                       <tr>

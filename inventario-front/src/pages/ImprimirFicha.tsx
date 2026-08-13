@@ -104,16 +104,16 @@ export default function ImprimirFicha() {
       </div>
 
       {/* Hoja 1 — datos del equipo */}
-      <div className="max-w-2xl mx-auto bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none">
+      <div className="max-w-2xl mx-auto bg-white p-8 print:p-0 my-6 print:my-0 shadow print:shadow-none relative">
+        {qrImage && (
+          <div className="absolute top-8 right-8 print:top-0 print:right-0 text-center">
+            <img src={qrImage} alt="QR del equipo" className="w-16 h-16" />
+            <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
+          </div>
+        )}
         <EncabezadoImpreso {...props} />
 
-        <div className="relative">
-          {qrImage && (
-            <div className="absolute top-20 right-0 text-center z-10">
-              <img src={qrImage} alt="QR del equipo" className="w-16 h-16" />
-              <div className="text-[8px] text-texto-sec">{equipo.numero_equipo}</div>
-            </div>
-          )}
+        <div>
           <table className="w-full border-collapse">
           <tbody>
             {/* INFO */}
