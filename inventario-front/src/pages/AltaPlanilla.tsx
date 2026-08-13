@@ -94,8 +94,13 @@ export default function AltaPlanilla() {
 
     setGuardando(true);
     try {
+      const conGuion = (valor: string) => valor.trim() || '-';
       const response = await api.post('/equipos', {
         ...form,
+        monitor_modelo: conGuion(form.monitor_modelo),
+        monitor_tamano: conGuion(form.monitor_tamano),
+        impresora_modelo: conGuion(form.impresora_modelo),
+        impresora_insumos: conGuion(form.impresora_insumos),
         id_oficina: Number(selOficina),
         hardware_otros: hardwareOtros.filter(v => v.trim()).join('\n') || null,
         perifericos_otros: perifericosOtros.filter(v => v.trim()).join('\n') || null,
@@ -119,6 +124,7 @@ export default function AltaPlanilla() {
 
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Ubicación y responsable</h3>
+            <label className={labelClass}>Ubicación <span className="text-baja">*</span></label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <select value={selDestino} onChange={e => setSelDestino(e.target.value)} className={inputClass}>
                 <option value="">Destino...</option>
@@ -139,11 +145,11 @@ export default function AltaPlanilla() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>N° de Equipo</label>
+                <label className={labelClass}>N° de Equipo <span className="text-baja">*</span></label>
                 <input value={form.numero_equipo} onChange={e => setCampo('numero_equipo', e.target.value)} placeholder="Ej: SGNAWI0001" className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Usuario Responsable</label>
+                <label className={labelClass}>Usuario Responsable <span className="text-baja">*</span></label>
                 <input value={form.usuario_responsable} onChange={e => setCampo('usuario_responsable', e.target.value)} placeholder="Ej: TF GOMEZ" className={inputClass} />
               </div>
             </div>
@@ -155,7 +161,7 @@ export default function AltaPlanilla() {
               El <b>nombre de PC</b> se genera solo, a partir de la oficina y el dominio elegidos (ej: <code>13-111.R5</code>) — no hace falta cargarlo a mano.
             </div>
             <div className="mb-3">
-              <label className={labelClass}>Usuario de Red</label>
+              <label className={labelClass}>Usuario de Red <span className="text-baja">*</span></label>
               <input value={form.nombre_usuario_red} onChange={e => setCampo('nombre_usuario_red', e.target.value)} placeholder="Ej: SGNA.INFORMATICA" className={inputClass} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -188,12 +194,12 @@ export default function AltaPlanilla() {
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Hardware</h3>
             <div className="mb-3">
-              <label className={labelClass}>Procesador</label>
+              <label className={labelClass}>Procesador <span className="text-baja">*</span></label>
               <input value={form.procesador} onChange={e => setCampo('procesador', e.target.value)} placeholder="Ej: AMD Ryzen 7 5700" className={inputClass} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
               <div>
-                <label className={labelClass}>Capacidad RAM</label>
+                <label className={labelClass}>Capacidad RAM <span className="text-baja">*</span></label>
                 <input value={form.ram_capacidad} onChange={e => setCampo('ram_capacidad', e.target.value)} placeholder="Ej: 8GB" className={inputClass} />
               </div>
               <div>
@@ -207,7 +213,7 @@ export default function AltaPlanilla() {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Disco</label>
+                <label className={labelClass}>Disco <span className="text-baja">*</span></label>
                 <input value={form.disco} onChange={e => setCampo('disco', e.target.value)} placeholder="Ej: 1TB HDD" className={inputClass} />
               </div>
             </div>
@@ -221,19 +227,19 @@ export default function AltaPlanilla() {
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Periféricos</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
-                <label className={labelClass}>Monitor (modelo)</label>
+                <label className={labelClass}>Monitor (modelo) <span className="text-texto-sec/60 normal-case font-normal">— opcional</span></label>
                 <input value={form.monitor_modelo} onChange={e => setCampo('monitor_modelo', e.target.value)} placeholder="Ej: Philips 22&quot;" className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Monitor (tamaño)</label>
+                <label className={labelClass}>Monitor (tamaño) <span className="text-texto-sec/60 normal-case font-normal">— opcional</span></label>
                 <input value={form.monitor_tamano} onChange={e => setCampo('monitor_tamano', e.target.value)} placeholder="Ej: 22 pulgadas" className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Impresora (modelo)</label>
+                <label className={labelClass}>Impresora (modelo) <span className="text-texto-sec/60 normal-case font-normal">— opcional</span></label>
                 <input value={form.impresora_modelo} onChange={e => setCampo('impresora_modelo', e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Impresora (insumos)</label>
+                <label className={labelClass}>Impresora (insumos) <span className="text-texto-sec/60 normal-case font-normal">— opcional</span></label>
                 <input value={form.impresora_insumos} onChange={e => setCampo('impresora_insumos', e.target.value)} className={inputClass} />
               </div>
             </div>
