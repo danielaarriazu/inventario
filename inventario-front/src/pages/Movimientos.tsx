@@ -177,7 +177,7 @@ export default function Movimientos() {
     setPerifericosOtros(['']);
   };
 
-  const handleQRDetectado = (textoLeido: string) => {
+  const handleQRDetectado = async (textoLeido: string) => {
     setEscaneando(false);
     if (!textoLeido) {
       setError('No se pudo acceder a la cámara o no se detectó ningún QR.');
@@ -189,13 +189,24 @@ export default function Movimientos() {
       setError('El código escaneado no corresponde a un equipo de este sistema.');
       return;
     }
-    const encontrado = equipos.find(eq => eq.id_planilla === id);
-    if (!encontrado) {
-      setError('El equipo escaneado no se encontró en tu listado.');
+    setError('');
+
+    // Primero buscamos en lo que ya tenemos cargado (rápido). Si no está
+    // ahí — por ejemplo, porque escaneaste apenas entraste y la lista
+    // todavía no había terminado de cargar — lo pedimos directo por ID
+    // en vez de fallar.
+    const enLista = equipos.find(eq => eq.id_planilla === id);
+    if (enLista) {
+      seleccionarEquipo(enLista);
       return;
     }
-    setError('');
-    seleccionarEquipo(encontrado);
+
+    try {
+      const res = await api.get(`/equipos/${id}`);
+      seleccionarEquipo(res.data);
+    } catch {
+      setError('El equipo escaneado no se encontró.');
+    }
   };
 
   const setCampoComponente = (campo: string, valor: any) => setComponentes((prev: any) => ({ ...prev, [campo]: valor }));
