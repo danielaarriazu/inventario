@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
@@ -14,8 +14,13 @@ export default function RegistroCargo() {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
+  const [despertando, setDespertando] = useState(true);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/status').catch(() => {}).finally(() => setDespertando(false));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,7 +45,7 @@ export default function RegistroCargo() {
       <form onSubmit={handleSubmit} className="space-y-4 p-8 bg-superficie rounded-xl shadow-lg w-full border border-borde">
 
         <div className="text-center mb-6">
-          <div className="text-2xl mb-1">⚓</div>
+          <div className={`text-2xl mb-1 inline-block ${despertando ? 'animate-spin' : ''}`}>⚓</div>
           <h2 className="text-xl font-bold text-primario">Alta de Nuevo Cargo</h2>
           <p className="text-sm text-texto-sec mt-1">Configure el cargo y el encargado</p>
         </div>

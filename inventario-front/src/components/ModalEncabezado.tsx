@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import api from '../services/api';
 import { X, FileText } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+}
+
+interface Encabezado {
+  encabezado_linea1: string;
+  encabezado_destino: string;
+  encabezado_linea3: string;
+  encabezado_titulo: string;
+  encabezado_anio: string;
 }
 
 // Solo el Responsable la usa — acá se configuran las 5 líneas del
@@ -19,10 +27,15 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
   const [mensaje, setMensaje] = useState('');
   const [guardando, setGuardando] = useState(false);
 
+  // Guardamos lo que vino del servidor para poder comparar y saber si
+  // realmente cambió algo antes de habilitar Guardar
+  const originalRef = useRef<Encabezado | null>(null);
+
   useEffect(() => {
     if (!isOpen) return;
     setError(''); setMensaje('');
     api.get('/cargo/encabezado').then(res => {
+      originalRef.current = res.data;
       setLinea1(res.data.encabezado_linea1);
       setDestino(res.data.encabezado_destino);
       setLinea3(res.data.encabezado_linea3);
@@ -33,18 +46,35 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
 
   if (!isOpen) return null;
 
+  const huboCambios = !originalRef.current || (
+    linea1 !== originalRef.current.encabezado_linea1 ||
+    destino !== originalRef.current.encabezado_destino ||
+    linea3 !== originalRef.current.encabezado_linea3 ||
+    titulo !== originalRef.current.encabezado_titulo ||
+    anio !== originalRef.current.encabezado_anio
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setMensaje('');
+
+    if (!linea1.trim() || !destino.trim() || !linea3.trim() || !titulo.trim() || !anio.trim()) {
+      setError('Completá las 5 líneas del encabezado');
+      return;
+    }
+    if (!huboCambios) return;
+
     setGuardando(true);
     try {
-      await api.put('/cargo/encabezado', {
+      const nuevo = {
         encabezado_linea1: linea1,
         encabezado_destino: destino,
         encabezado_linea3: linea3,
         encabezado_titulo: titulo,
         encabezado_anio: anio,
-      });
+      };
+      await api.put('/cargo/encabezado', nuevo);
+      originalRef.current = nuevo;
       setMensaje('Encabezado actualizado correctamente.');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al guardar el encabezado');
@@ -81,31 +111,31 @@ export default function ModalEncabezado({ isOpen, onClose }: Props) {
           </div>
 
           <div className="space-y-1">
-            <label className={labelClass}>Division</label>
+            <label className={labelClass}>Division <span className="text-baja">*</span></label>
             <input required value={linea1} onChange={e => setLinea1(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className={labelClass}>Destino</label>
+            <label className={labelClass}>Destino <span className="text-baja">*</span></label>
             <input required value={destino} onChange={e => setDestino(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className={labelClass}>Cargo</label>
+            <label className={labelClass}>Cargo <span className="text-baja">*</span></label>
             <input required value={linea3} onChange={e => setLinea3(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className={labelClass}>Título de la planilla</label>
+            <label className={labelClass}>Título de la planilla <span className="text-baja">*</span></label>
             <input required value={titulo} onChange={e => setTitulo(e.target.value)} className={inputClass} />
           </div>
           <div className="space-y-1">
-            <label className={labelClass}>Año</label>
+            <label className={labelClass}>Año <span className="text-baja">*</span></label>
             <input required value={anio} onChange={e => setAnio(e.target.value)} className={inputClass} />
           </div>
 
           <button
-            type="submit" disabled={guardando}
-            className="w-full bg-primario hover:bg-primario-hover text-white font-bold p-3 rounded-lg transition-colors cursor-pointer text-sm disabled:opacity-60"
+            type="submit" disabled={guardando || !huboCambios}
+            className="w-full bg-primario hover:bg-primario-hover text-white font-bold p-3 rounded-lg transition-colors cursor-pointer text-sm disabled:opacity-50"
           >
-            {guardando ? 'Guardando...' : 'Guardar'}
+            {guardando ? 'Guardando...' : huboCambios ? 'Guardar' : 'Sin cambios'}
           </button>
         </form>
       </div>

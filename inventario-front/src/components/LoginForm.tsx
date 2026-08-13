@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
@@ -8,7 +8,15 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState('');
+  const [despertando, setDespertando] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Apenas se carga la pantalla, le pegamos al servidor para que empiece
+    // a "despertar" (Render + la base) mientras la persona todavía está
+    // tipeando sus credenciales — así no espera el cold-start después
+    api.get('/status').catch(() => {}).finally(() => setDespertando(false));
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +34,7 @@ export default function LoginForm() {
     <div className="flex flex-col items-center">
       <form onSubmit={handleLogin} className="space-y-4 p-8 bg-superficie rounded-xl shadow-lg w-96 border border-borde">
         <div className="text-center mb-6">
-          <div className="text-2xl mb-1">⚓</div>
+          <div className={`text-2xl mb-1 inline-block ${despertando ? 'animate-spin' : ''}`}>⚓</div>
           <h2 className="text-xl font-bold text-primario">Sistema de Inventario</h2>
         </div>
 

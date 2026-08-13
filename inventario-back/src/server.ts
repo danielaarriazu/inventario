@@ -15,12 +15,22 @@ import cargoRoutes from './routes/cargo.routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './docs/swagger.json';
 
+import prisma from './config/db';
+
 const app = express();
 app.use(cros());
 app.use(express.json());
 
-app.get('/api/status', (req, res) => {
-  res.json({ mensaje: '¡El servidor del inventario está corriendo perfecto!' });
+// Endpoint liviano para "despertar" tanto el servidor (Render) como la base
+// (Neon) — el front lo llama apenas carga la pantalla de Login, antes de
+// que la persona termine de tipear sus credenciales
+app.get('/api/status', async (req, res) => {
+  try {
+    await prisma.cargo.count();
+    res.json({ mensaje: '¡El servidor del inventario está corriendo perfecto!' });
+  } catch (error) {
+    res.status(503).json({ mensaje: 'El servidor está despertando, probá de nuevo en unos segundos' });
+  }
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
