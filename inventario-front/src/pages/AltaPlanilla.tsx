@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import CampoMultilinea from '../components/CampoMultilinea';
-import { ArrowLeft } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import { ArrowLeft, Menu as MenuIcon } from 'lucide-react';
 
 interface OpcionSimple { id: number; nombre: string; }
 
@@ -13,6 +14,12 @@ export default function AltaPlanilla() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [perfil, setPerfil] = useState<{ nombre_apellido: string; mr: string } | null>(null);
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
+  }, []);
 
   const [destinos, setDestinos] = useState<OpcionSimple[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSimple[]>([]);
@@ -109,11 +116,21 @@ export default function AltaPlanilla() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <nav className="bg-primario p-4 shadow-md flex items-center gap-3 w-full">
-        <button onClick={() => navigate('/dashboard/equipos')} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-lg font-bold text-white tracking-wide">Alta de Nueva Planilla</h1>
+      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate('/dashboard/equipos')} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
+            <MenuIcon className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-bold text-white tracking-wide">Alta de Nueva Planilla</h1>
+        </div>
+        {perfil && (
+          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+            {perfil.nombre_apellido} · MR {perfil.mr}
+          </div>
+        )}
       </nav>
 
       <main className="p-6 max-w-3xl mx-auto w-full flex-grow">
@@ -265,6 +282,8 @@ export default function AltaPlanilla() {
           </button>
         </form>
       </main>
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

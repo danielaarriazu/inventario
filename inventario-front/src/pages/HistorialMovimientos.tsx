@@ -64,7 +64,12 @@ export default function HistorialMovimientos() {
   const [filtroTipo, setFiltroTipo] = useState<typeof TIPOS_ACCION[number]>('TODOS');
   const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [perfil, setPerfil] = useState<{ nombre_apellido: string; mr: string } | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const fetchHistorial = async () => {
@@ -99,6 +104,11 @@ export default function HistorialMovimientos() {
           </button>
           <h1 className="text-lg font-bold text-white tracking-wide">Historial de Movimientos</h1>
         </div>
+        {perfil && (
+          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+            {perfil.nombre_apellido} · MR {perfil.mr}
+          </div>
+        )}
       </nav>
 
       <main className="p-8 max-w-5xl mx-auto mt-4 flex-grow w-full">

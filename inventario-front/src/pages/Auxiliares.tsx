@@ -13,7 +13,12 @@ interface Auxiliar {
   rol: string;
 }
 
-interface Perfil { rol: string; }
+interface Perfil { rol: string; nombre_apellido: string; mr: string; }
+
+const ETIQUETA_ROL: Record<string, string> = {
+  RESPONSABLE: 'ENCARGADO',
+  SUBORDINADO: 'AUXILIAR',
+};
 
 export default function Auxiliares() {
   const [auxiliares, setAuxiliares] = useState<Auxiliar[]>([]);
@@ -89,6 +94,11 @@ export default function Auxiliares() {
             Auxiliares de mi Cargo
           </h1>
         </div>
+        {perfil && (
+          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+            {perfil.nombre_apellido} · MR {perfil.mr}
+          </div>
+        )}
       </nav>
 
       {/* Cuerpo Principal */}
@@ -149,7 +159,7 @@ export default function Auxiliares() {
                             ? 'bg-champagne/40 text-primario border-champagne'
                             : 'bg-acento/10 text-acento border-acento/30'
                         }`}>
-                          {aux.rol}
+                          {ETIQUETA_ROL[aux.rol] || aux.rol}
                         </span>
                       </td>
                       {esResponsable && (

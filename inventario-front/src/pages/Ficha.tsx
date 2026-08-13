@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import CampoMultilinea from '../components/CampoMultilinea';
-import { ArrowLeft, Pencil, X, Download, QrCode, Printer } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import { ArrowLeft, Pencil, X, Download, QrCode, Printer, Menu as MenuIcon } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -119,6 +120,12 @@ export default function Ficha() {
   const [perifericosOtros, setPerifericosOtros] = useState<string[]>(['']);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [perfil, setPerfil] = useState<{ nombre_apellido: string; mr: string } | null>(null);
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
+  }, []);
 
   const cargarTodo = async () => {
     try {
@@ -232,13 +239,21 @@ export default function Ficha() {
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
       <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button onClick={() => navigate('/dashboard/equipos')} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Ficha de Equipo</h1>
+          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
+            <MenuIcon className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-bold text-white tracking-wide hidden sm:block">Ficha de Equipo</h1>
         </div>
         <div className="flex items-center gap-2">
+          {perfil && (
+            <div className="hidden lg:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+              {perfil.nombre_apellido} · MR {perfil.mr}
+            </div>
+          )}
           {!editando && (
             <button onClick={() => navigate(`/equipos/${id}/imprimir`)} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer">
               <Printer className="w-4 h-4" /> Imprimir
@@ -415,6 +430,8 @@ export default function Ficha() {
           </div>
         </div>
       </main>
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }
