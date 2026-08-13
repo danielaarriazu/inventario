@@ -14,7 +14,10 @@ export default function EscanerQR({ onDetectado, onClose }: EscanerQRProps) {
   const yaLeidoRef = useRef(false);
 
   useEffect(() => {
-    const scanner = new Html5Qrcode(contenedorId);
+    // useBarCodeDetectorIfSupported va en el CONSTRUCTOR, no en start() —
+    // usa la API nativa del navegador (Chrome/Android) para detectar QR,
+    // mucho más rápida y confiable que el decodificador en JS puro
+    const scanner = new Html5Qrcode(contenedorId, { useBarCodeDetectorIfSupported: true, verbose: false });
     let cancelado = false;
 
     // Guardamos la promesa de arranque para poder esperarla en la limpieza
