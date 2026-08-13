@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import EscanerQR from '../components/EscanerQR';
 import CampoMultilinea from '../components/CampoMultilinea';
-import Sidebar from '../components/Sidebar';
-import { Menu as MenuIcon, Search, X, CheckCircle2, QrCode, Wrench } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Search, X, CheckCircle2, QrCode, Wrench } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -27,7 +27,6 @@ interface Equipo {
   estado_equipo: 'ACTIVO' | 'REPARACION' | 'BAJA';
   oficina?: { numero_oficina: string };
 }
-interface Perfil { nombre_apellido: string; mr: string; }
 interface OpcionSimple { id: number; nombre: string; }
 
 const TIPOS_ACCION = [
@@ -48,8 +47,6 @@ const aTexto = (lista: string[]) => lista.filter(v => v.trim()).join('\n') || nu
 
 export default function Movimientos() {
   const navigate = useNavigate();
-  const [perfil, setPerfil] = useState<Perfil | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Búsqueda de equipo
   const [equipos, setEquipos] = useState<Equipo[]>([]);
@@ -88,12 +85,10 @@ export default function Movimientos() {
   useEffect(() => {
     const cargarInicial = async () => {
       try {
-        const [perfilRes, equiposRes, destinosRes] = await Promise.all([
-          api.get('/auth/me'),
+        const [equiposRes, destinosRes] = await Promise.all([
           api.get('/equipos'),
           api.get('/destinos'),
         ]);
-        setPerfil(perfilRes.data);
         setEquipos(equiposRes.data);
         setDestinos(destinosRes.data.map((d: any) => ({ id: d.id_destino, nombre: d.nombre_destino })));
       } catch (err: any) {
@@ -260,19 +255,7 @@ export default function Movimientos() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold text-white">Movimientos</h1>
-        </div>
-        {perfil && (
-          <div className="bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
-            {perfil.nombre_apellido} · MR {perfil.mr}
-          </div>
-        )}
-      </nav>
+      <Navbar titulo="Movimientos" />
 
       <main className="p-5 max-w-lg w-full mx-auto flex-grow">
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
@@ -561,8 +544,6 @@ export default function Movimientos() {
       {escaneando && (
         <EscanerQR onDetectado={handleQRDetectado} onClose={() => setEscaneando(false)} />
       )}
-
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

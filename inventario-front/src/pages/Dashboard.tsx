@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDestino from '../components/ModalNuevoDestino';
-import { PlusCircle, Users, LogOut, LayoutDashboard, Menu as MenuIcon, Monitor } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
+import Navbar from '../components/Navbar';
+import { PlusCircle, Users, LayoutDashboard, Monitor } from 'lucide-react';
 
 interface Destino {
   id_destino: number;
@@ -22,7 +22,6 @@ export default function Dashboard() {
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cargando, setCargando] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const fetchDestinos = async () => {
@@ -55,45 +54,9 @@ export default function Dashboard() {
     fetchPerfil();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-  };
-
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-          >
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          
-          <div>
-            <h1 className="text-lg font-bold text-white tracking-wide">
-              Sistema de Inventario
-            </h1>
-          </div>
-        </div>
-
-        {/* Sección Derecha: Usuario y Salir modificado a tu diseño */}
-        <div className="flex items-center gap-3">
-          {perfil && (
-            <div className="hidden md:flex bg-slate-800 border border-slate-700 text-white text-sm font-semibold px-4 py-1.5 rounded-md items-center shadow-sm">
-              {perfil.nombre_apellido} • MR {perfil.mr}
-            </div>
-          )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-[#2a1b1b] hover:bg-red-950 border border-red-900/50 text-white text-sm font-semibold px-4 py-1.5 rounded-md transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" /> Salir
-          </button>
-        </div>
-      </nav>
+      <Navbar titulo="Sistema de Inventario" />
 
       {/* Cuerpo Principal */}
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
@@ -180,8 +143,6 @@ export default function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         onDestinoCreado={fetchDestinos}
       />
-
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
-import Sidebar from '../components/Sidebar';
-import { DoorOpen, PlusCircle, ArrowLeft, Printer, Search, Menu as MenuIcon } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { DoorOpen, PlusCircle, Printer, Search } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
@@ -20,7 +20,6 @@ export default function Oficinas() {
   const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
 
@@ -50,27 +49,7 @@ export default function Oficinas() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate(-1)}
-            className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">
-            Sistema de Inventario
-          </h1>
-        </div>
-        {perfil && (
-          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
-            {perfil.nombre_apellido} · MR {perfil.mr}
-          </div>
-        )}
-      </nav>
+      <Navbar titulo="Sistema de Inventario" onBack={() => navigate(-1)} />
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
         <div className="text-sm text-texto-sec mb-4">
@@ -160,8 +139,6 @@ export default function Oficinas() {
         onOficinaCreada={fetchOficinas}
         idDivision={Number(idDivision)}
       />
-
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

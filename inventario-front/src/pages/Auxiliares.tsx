@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoAuxiliar from '../components/ModalNuevoAuxiliar';
 import ModalResetearPassword from '../components/ModalResetearPassword';
-import Sidebar from '../components/Sidebar';
-import { Users, PlusCircle, Menu as MenuIcon, ShieldAlert, KeyRound, UserX } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Users, PlusCircle, ShieldAlert, KeyRound, UserX } from 'lucide-react';
 
 interface Auxiliar {
   id_usuario: number;
@@ -25,7 +25,6 @@ export default function Auxiliares() {
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cargando, setCargando] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [resetObjetivo, setResetObjetivo] = useState<Auxiliar | null>(null);
   const navigate = useNavigate();
 
@@ -81,25 +80,7 @@ export default function Auxiliares() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
-          >
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">
-            Auxiliares de mi Cargo
-          </h1>
-        </div>
-        {perfil && (
-          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
-            {perfil.nombre_apellido} · MR {perfil.mr}
-          </div>
-        )}
-      </nav>
+      <Navbar titulo="Auxiliares de mi Cargo" />
 
       {/* Cuerpo Principal */}
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
@@ -201,8 +182,6 @@ export default function Auxiliares() {
         idUsuario={resetObjetivo?.id_usuario ?? null}
         nombreUsuario={resetObjetivo?.nombre_apellido}
       />
-
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }

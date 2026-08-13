@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import Sidebar from '../components/Sidebar';
-import { Menu as MenuIcon, Search, PlusCircle, FileSpreadsheet } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Search, PlusCircle, FileSpreadsheet } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -43,7 +43,6 @@ export default function Equipos() {
   const [filtroConexion, setFiltroConexion] = useState<typeof CONEXIONES[number]>('TODAS');
   const [descargando, setDescargando] = useState(false);
   const [cargando, setCargando] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -105,19 +104,7 @@ export default function Equipos() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
-            <MenuIcon className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Equipos</h1>
-        </div>
-        {perfil && (
-          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
-            {perfil.nombre_apellido} · MR {perfil.mr}
-          </div>
-        )}
-      </nav>
+      <Navbar titulo="Equipos" />
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
         {idOficina && (
@@ -265,8 +252,6 @@ export default function Equipos() {
           )}
         </div>
       </main>
-
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }
