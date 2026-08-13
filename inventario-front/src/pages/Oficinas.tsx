@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
+import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { DoorOpen, PlusCircle, Printer, Search } from 'lucide-react';
+import { DoorOpen, PlusCircle, Printer, Search, Pencil } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
@@ -20,6 +21,7 @@ export default function Oficinas() {
   const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [renombrando, setRenombrando] = useState<Oficina | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
 
@@ -110,18 +112,29 @@ export default function Oficinas() {
                   <h3 className="text-lg font-bold text-primario flex items-center gap-2 group-hover:text-acento transition-colors">
                     <DoorOpen className="w-4 h-4 text-acento" /> Oficina {of.numero_oficina}
                   </h3>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/dashboard/oficinas/${of.id_oficina}/imprimir`, {
-                        state: { numeroOficina: of.numero_oficina }
-                      });
-                    }}
-                    title="Imprimir todas las planillas de esta oficina"
-                    className="text-texto-sec hover:text-acento cursor-pointer flex-shrink-0"
-                  >
-                    <Printer className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {perfil?.rol === 'RESPONSABLE' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setRenombrando(of); }}
+                        className="text-texto-sec hover:text-acento cursor-pointer"
+                        title="Renombrar"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/dashboard/oficinas/${of.id_oficina}/imprimir`, {
+                          state: { numeroOficina: of.numero_oficina }
+                        });
+                      }}
+                      title="Imprimir todas las planillas de esta oficina"
+                      className="text-texto-sec hover:text-acento cursor-pointer"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-4 pt-3 border-t border-borde flex justify-end items-center text-xs font-bold text-acento">
                   <span>Ver Equipos</span>
@@ -138,6 +151,19 @@ export default function Oficinas() {
         onClose={() => setIsModalOpen(false)}
         onOficinaCreada={fetchOficinas}
         idDivision={Number(idDivision)}
+      />
+
+      <ModalRenombrar
+        isOpen={!!renombrando}
+        onClose={() => setRenombrando(null)}
+        titulo="Renombrar Oficina"
+        camposIniciales={renombrando ? [
+          { key: 'numero_oficina', label: 'N° de Oficina', valor: renombrando.numero_oficina },
+        ] : []}
+        onGuardar={async (valores) => {
+          await api.put(`/oficinas/${renombrando!.id_oficina}`, valores);
+          fetchOficinas();
+        }}
       />
     </div>
   );

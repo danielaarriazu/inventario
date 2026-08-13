@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevoDepartamento from '../components/ModalNuevoDepartamento';
+import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { Building2, PlusCircle, Search } from 'lucide-react';
+import { Building2, PlusCircle, Search, Pencil } from 'lucide-react';
 
 interface Departamento {
   id_departamento: number;
@@ -21,6 +22,7 @@ export default function Departamentos() {
   const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [renombrando, setRenombrando] = useState<Departamento | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
 
@@ -111,6 +113,15 @@ export default function Departamentos() {
                   <h3 className="text-lg font-bold text-primario group-hover:text-acento transition-colors">
                     {depto.nombre_departamento}
                   </h3>
+                  {perfil?.rol === 'RESPONSABLE' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setRenombrando(depto); }}
+                      className="text-texto-sec hover:text-acento cursor-pointer flex-shrink-0"
+                      title="Renombrar"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
                 <p className="text-xs text-texto-sec mt-2 bg-fondo p-2.5 rounded border border-borde">
                   Abreviatura: <span className="font-bold text-tinta">{depto.abreviatura}</span>
@@ -130,6 +141,20 @@ export default function Departamentos() {
         onClose={() => setIsModalOpen(false)}
         onDepartamentoCreado={fetchDepartamentos}
         idDestino={Number(idDestino)}
+      />
+
+      <ModalRenombrar
+        isOpen={!!renombrando}
+        onClose={() => setRenombrando(null)}
+        titulo="Renombrar Departamento"
+        camposIniciales={renombrando ? [
+          { key: 'nombre_departamento', label: 'Nombre', valor: renombrando.nombre_departamento },
+          { key: 'abreviatura', label: 'Abreviatura', valor: renombrando.abreviatura },
+        ] : []}
+        onGuardar={async (valores) => {
+          await api.put(`/departamentos/${renombrando!.id_departamento}`, valores);
+          fetchDepartamentos();
+        }}
       />
     </div>
   );

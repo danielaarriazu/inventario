@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevaDivision from '../components/ModalnuevaDivision';
+import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { Layers, PlusCircle, Search } from 'lucide-react';
+import { Layers, PlusCircle, Search, Pencil } from 'lucide-react';
 
 interface Division {
   id_division: number;
@@ -21,6 +22,7 @@ export default function Divisiones() {
   const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [renombrando, setRenombrando] = useState<Division | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
 
@@ -111,6 +113,15 @@ export default function Divisiones() {
                   <h3 className="text-lg font-bold text-primario group-hover:text-acento transition-colors">
                     {div.nombre_division}
                   </h3>
+                  {perfil?.rol === 'RESPONSABLE' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setRenombrando(div); }}
+                      className="text-texto-sec hover:text-acento cursor-pointer flex-shrink-0"
+                      title="Renombrar"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
                 <p className="text-xs text-texto-sec mt-2 bg-fondo p-2.5 rounded border border-borde">
                   Abreviatura: <span className="font-bold text-tinta">{div.abreviatura}</span>
@@ -130,6 +141,20 @@ export default function Divisiones() {
         onClose={() => setIsModalOpen(false)}
         onDivisionCreada={fetchDivisiones}
         idDepartamento={Number(idDepartamento)}
+      />
+
+      <ModalRenombrar
+        isOpen={!!renombrando}
+        onClose={() => setRenombrando(null)}
+        titulo="Renombrar División"
+        camposIniciales={renombrando ? [
+          { key: 'nombre_division', label: 'Nombre', valor: renombrando.nombre_division },
+          { key: 'abreviatura', label: 'Abreviatura', valor: renombrando.abreviatura },
+        ] : []}
+        onGuardar={async (valores) => {
+          await api.put(`/divisiones/${renombrando!.id_division}`, valores);
+          fetchDivisiones();
+        }}
       />
     </div>
   );
