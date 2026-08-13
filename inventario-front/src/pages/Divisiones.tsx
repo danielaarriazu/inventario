@@ -4,12 +4,13 @@ import api from '../services/api';
 import ModalNuevaDivision from '../components/ModalnuevaDivision';
 import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { Layers, PlusCircle, Search, Pencil } from 'lucide-react';
+import { Layers, PlusCircle, Search, Pencil, Monitor } from 'lucide-react';
 
 interface Division {
   id_division: number;
   nombre_division: string;
   abreviatura: string;
+  cantidad_equipos: number;
 }
 interface Perfil { nombre_apellido: string; mr: string; rol: string; }
 
@@ -113,15 +114,20 @@ export default function Divisiones() {
                   <h3 className="text-lg font-bold text-primario group-hover:text-acento transition-colors">
                     {div.nombre_division}
                   </h3>
-                  {perfil?.rol === 'RESPONSABLE' && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setRenombrando(div); }}
-                      className="text-texto-sec hover:text-acento cursor-pointer flex-shrink-0"
-                      title="Renombrar"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-acento/10 text-acento">
+                      <Monitor className="w-3 h-3" /> {div.cantidad_equipos}
+                    </span>
+                    {perfil?.rol === 'RESPONSABLE' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setRenombrando(div); }}
+                        className="text-texto-sec hover:text-acento cursor-pointer"
+                        title="Renombrar"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <p className="text-xs text-texto-sec mt-2 bg-fondo p-2.5 rounded border border-borde">
                   Abreviatura: <span className="font-bold text-tinta">{div.abreviatura}</span>

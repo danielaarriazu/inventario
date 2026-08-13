@@ -3,8 +3,9 @@ import * as divisionService from '../services/division.service';
 
 export const getDivisiones = async (req: Request, res: Response) => {
   try {
+    const id_cargo = req.usuario!.id_cargo;
     const id_departamento = req.query.id_departamento ? parseInt(req.query.id_departamento as string, 10) : undefined;
-    const divisiones = await divisionService.obtenerDivisiones(id_departamento);
+    const divisiones = await divisionService.obtenerDivisiones(id_cargo, id_departamento);
     res.status(200).json(divisiones);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener las divisiones' });

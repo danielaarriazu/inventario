@@ -1,13 +1,16 @@
 import prisma from '../config/db';
+import { obtenerConteosPorNivel } from './equipo.service';
 
-export const obtenerDivisiones = async (id_departamento?: number) => {
-  return await prisma.division.findMany({
+export const obtenerDivisiones = async (id_cargo: number, id_departamento?: number) => {
+  const divisiones = await prisma.division.findMany({
     where: {
       estado: 'ALTA',
       ...(id_departamento ? { id_departamento } : {})
     },
     include: { departamento: true }
   });
+  const { porDivision } = await obtenerConteosPorNivel(id_cargo);
+  return divisiones.map(d => ({ ...d, cantidad_equipos: porDivision[d.id_division] || 0 }));
 };
 
 export const crearDivision = async (nombre_division: string, abreviatura: string, id_departamento: number) => {

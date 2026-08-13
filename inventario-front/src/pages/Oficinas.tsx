@@ -4,11 +4,12 @@ import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
 import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { DoorOpen, PlusCircle, Printer, Search, Pencil } from 'lucide-react';
+import { DoorOpen, PlusCircle, Printer, Search, Pencil, Monitor } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
   numero_oficina: string;
+  cantidad_equipos: number;
 }
 interface Perfil { nombre_apellido: string; mr: string; rol: string; }
 
@@ -113,6 +114,9 @@ export default function Oficinas() {
                     <DoorOpen className="w-4 h-4 text-acento" /> Oficina {of.numero_oficina}
                   </h3>
                   <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-acento/10 text-acento">
+                      <Monitor className="w-3 h-3" /> {of.cantidad_equipos}
+                    </span>
                     {perfil?.rol === 'RESPONSABLE' && (
                       <button
                         onClick={(e) => { e.stopPropagation(); setRenombrando(of); }}

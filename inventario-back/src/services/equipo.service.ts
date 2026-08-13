@@ -1,6 +1,50 @@
 import prisma from '../config/db';
 import QRCode from 'qrcode';
 
+// Cuenta los equipos de un cargo, agrupados por cada nivel de la jerarquía,
+// en una sola consulta — la usan destino/departamento/division/oficina
+// service para mostrar "cuántos equipos tiene cada uno"
+export const obtenerConteosPorNivel = async (id_cargo: number) => {
+  const equipos = await prisma.planilla_Equipo.findMany({
+    where: {
+      oficina: { division: { departamento: { destino: { id_cargo } } } }
+    },
+    select: {
+      id_oficina: true,
+      oficina: {
+        select: {
+          id_division: true,
+          division: {
+            select: {
+              id_departamento: true,
+              departamento: {
+                select: { id_destino: true }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const porOficina: Record<number, number> = {};
+  const porDivision: Record<number, number> = {};
+  const porDepartamento: Record<number, number> = {};
+  const porDestino: Record<number, number> = {};
+
+  for (const eq of equipos) {
+    porOficina[eq.id_oficina] = (porOficina[eq.id_oficina] || 0) + 1;
+    const idDivision = eq.oficina?.id_division;
+    if (idDivision) porDivision[idDivision] = (porDivision[idDivision] || 0) + 1;
+    const idDepartamento = eq.oficina?.division?.id_departamento;
+    if (idDepartamento) porDepartamento[idDepartamento] = (porDepartamento[idDepartamento] || 0) + 1;
+    const idDestino = eq.oficina?.division?.departamento?.id_destino;
+    if (idDestino) porDestino[idDestino] = (porDestino[idDestino] || 0) + 1;
+  }
+
+  return { porDestino, porDepartamento, porDivision, porOficina };
+};
+
 export const obtenerEquipos = async (id_cargo: number, id_oficina?: number) => {
   return await prisma.planilla_Equipo.findMany({
     where: {

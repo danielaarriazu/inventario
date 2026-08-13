@@ -9,6 +9,7 @@ interface Destino {
   id_destino: number;
   cod_destino: number;
   nombre_destino: string;
+  cantidad_equipos: number;
 }
 
 interface Perfil {
@@ -122,6 +123,9 @@ export default function Dashboard() {
                   <h3 className="text-lg font-bold text-primario group-hover:text-acento transition-colors">
                     {destino.nombre_destino}
                   </h3>
+                  <span className="flex items-center gap-1 text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-acento/10 text-acento flex-shrink-0">
+                    <Monitor className="w-3 h-3" /> {destino.cantidad_equipos}
+                  </span>
                 </div>
 
                 <p className="text-xs text-texto-sec mt-2 bg-fondo p-2.5 rounded border border-borde">

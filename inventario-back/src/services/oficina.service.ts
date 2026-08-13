@@ -1,13 +1,17 @@
 import prisma from '../config/db';
 
 export const obtenerOficinas = async (id_division?: number) => {
-  return await prisma.oficina.findMany({
+  const oficinas = await prisma.oficina.findMany({
     where: {
       estado: 'ALTA',
       ...(id_division ? { id_division } : {})
     },
-    include: { division: true }
+    include: {
+      division: true,
+      _count: { select: { equipos: true } }
+    }
   });
+  return oficinas.map(o => ({ ...o, cantidad_equipos: o._count.equipos }));
 };
 
 export const crearOficina = async (numero_oficina: string, id_division: number) => {
