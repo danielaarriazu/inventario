@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
-import { DoorOpen, PlusCircle, ArrowLeft, Printer } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import { DoorOpen, PlusCircle, ArrowLeft, Printer, Search, Menu as MenuIcon } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
   numero_oficina: string;
 }
+interface Perfil { nombre_apellido: string; mr: string; }
 
 export default function Oficinas() {
   const { idDivision } = useParams();
@@ -15,9 +17,16 @@ export default function Oficinas() {
   const nombreDivision = (location.state as { nombreDivision?: string })?.nombreDivision || 'División';
 
   const [oficinas, setOficinas] = useState<Oficina[]>([]);
+  const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
+  }, []);
 
   const fetchOficinas = async () => {
     setCargando(true);
@@ -42,17 +51,25 @@ export default function Oficinas() {
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
       <nav className="bg-primario p-4 shadow-md flex justify-between items-center w-full">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(-1)}
             className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
+          <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
+            <MenuIcon className="w-5 h-5" />
+          </button>
           <h1 className="text-lg font-bold text-white tracking-wide">
             Sistema de Inventario
           </h1>
         </div>
+        {perfil && (
+          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+            {perfil.nombre_apellido} · MR {perfil.mr}
+          </div>
+        )}
       </nav>
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
@@ -76,20 +93,31 @@ export default function Oficinas() {
           </button>
         </div>
 
+        <div className="relative mb-4">
+          <Search className="w-4 h-4 text-texto-sec absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Buscar oficina..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="w-full pl-9 pr-3 py-2.5 border border-borde rounded-lg text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cargando ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border border-borde text-center text-texto-sec text-sm font-medium">
               Cargando oficinas...
             </div>
-          ) : oficinas.length === 0 ? (
+          ) : oficinas.filter(o => o.numero_oficina.toLowerCase().includes(busqueda.toLowerCase())).length === 0 ? (
             <div className="col-span-full bg-superficie p-10 rounded-xl border-2 border-dashed border-borde text-center">
               <p className="text-texto-sec font-medium text-sm">
-                Todavía no hay oficinas cargadas en esta división.
+                {busqueda ? 'No hay oficinas que coincidan con la búsqueda.' : 'Todavía no hay oficinas cargadas en esta división.'}
               </p>
-              <p className="text-xs text-texto-sec/70 mt-1">Usá "Nueva Oficina" para empezar.</p>
+              {!busqueda && <p className="text-xs text-texto-sec/70 mt-1">Usá "Nueva Oficina" para empezar.</p>}
             </div>
           ) : (
-            oficinas.map(of => (
+            oficinas.filter(o => o.numero_oficina.toLowerCase().includes(busqueda.toLowerCase())).map(of => (
               <div
                 key={of.id_oficina}
                 onClick={() => navigate(`/dashboard/equipos?id_oficina=${of.id_oficina}`, {
@@ -130,6 +158,8 @@ export default function Oficinas() {
         onOficinaCreada={fetchOficinas}
         idDivision={Number(idDivision)}
       />
+
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     </div>
   );
 }
