@@ -4,7 +4,7 @@ import { verificarToken, soloResponsable } from '../middlewares/auth.middleware'
 
 const router = Router();
 router.get('/', verificarToken, getOficinas);
-router.post('/', verificarToken, createOficina);
-router.put('/:id', verificarToken, updateOficina);
+router.post('/', verificarToken, soloResponsable, createOficina);
+router.put('/:id', verificarToken, soloResponsable, updateOficina);
 router.delete('/:id', verificarToken, soloResponsable, softDeleteOficina);
 export default router;
