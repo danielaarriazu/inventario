@@ -10,7 +10,7 @@ interface Division {
   nombre_division: string;
   abreviatura: string;
 }
-interface Perfil { nombre_apellido: string; mr: string; }
+interface Perfil { nombre_apellido: string; mr: string; rol: string; }
 
 export default function Divisiones() {
   const { idDepartamento } = useParams();
@@ -86,12 +86,14 @@ export default function Divisiones() {
             <p className="text-sm text-texto-sec mt-1">Estructura interna del departamento.</p>
           </div>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
-          >
-            <PlusCircle className="w-4 h-4" /> Nueva División
-          </button>
+          {perfil?.rol === 'RESPONSABLE' && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
+            >
+              <PlusCircle className="w-4 h-4" /> Nueva División
+            </button>
+          )}
         </div>
 
         <div className="relative mb-4">

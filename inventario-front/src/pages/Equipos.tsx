@@ -15,6 +15,7 @@ interface Equipo {
   estado_equipo: 'ACTIVO' | 'REPARACION' | 'BAJA';
   oficina?: { numero_oficina: string };
 }
+interface Perfil { nombre_apellido: string; mr: string; rol: string; }
 
 const ESTADO_ESTILOS: Record<string, string> = {
   ACTIVO: 'bg-activo text-white',
@@ -43,9 +44,14 @@ export default function Equipos() {
   const [descargando, setDescargando] = useState(false);
   const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+
+  useEffect(() => {
+    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
+  }, []);
 
   const idOficina = searchParams.get('id_oficina');
   const numeroOficina = (location.state as { numeroOficina?: string })?.numeroOficina;
@@ -104,8 +110,13 @@ export default function Equipos() {
           <button onClick={() => setSidebarOpen(true)} className="bg-white/10 p-2 rounded-lg text-white hover:bg-white/20 transition-colors cursor-pointer">
             <MenuIcon className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-white tracking-wide">Sistema de Inventario</h1>
+          <h1 className="text-lg font-bold text-white tracking-wide">Equipos</h1>
         </div>
+        {perfil && (
+          <div className="hidden sm:block bg-white/10 px-3 py-1.5 rounded-md text-xs text-white/90 font-semibold">
+            {perfil.nombre_apellido} · MR {perfil.mr}
+          </div>
+        )}
       </nav>
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
@@ -123,13 +134,15 @@ export default function Equipos() {
             <p className="text-sm text-texto-sec mt-1">Buscá, revisá o descargá el inventario completo.</p>
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
-            <button
-              onClick={handleDescargarExcel}
-              disabled={descargando}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm disabled:opacity-60"
-            >
-              <FileSpreadsheet className="w-4 h-4" /> {descargando ? 'Generando...' : 'Descargar Excel'}
-            </button>
+            {perfil?.rol === 'RESPONSABLE' && (
+              <button
+                onClick={handleDescargarExcel}
+                disabled={descargando}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm disabled:opacity-60"
+              >
+                <FileSpreadsheet className="w-4 h-4" /> {descargando ? 'Generando...' : 'Descargar Excel'}
+              </button>
+            )}
             <button
               onClick={() => navigate('/dashboard/equipos/nuevo')}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"

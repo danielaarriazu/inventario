@@ -64,12 +64,18 @@ export default function HistorialMovimientos() {
   const [filtroTipo, setFiltroTipo] = useState<typeof TIPOS_ACCION[number]>('TODOS');
   const [cargando, setCargando] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [perfil, setPerfil] = useState<{ nombre_apellido: string; mr: string } | null>(null);
+  const [perfil, setPerfil] = useState<{ nombre_apellido: string; mr: string; rol: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
-  }, []);
+    api.get('/auth/me').then(res => {
+      setPerfil(res.data);
+      // Un auxiliar no ve el historial general — ni por URL directa
+      if (res.data.rol !== 'RESPONSABLE') {
+        navigate('/menu');
+      }
+    }).catch(() => {});
+  }, [navigate]);
 
   useEffect(() => {
     const fetchHistorial = async () => {
@@ -78,7 +84,8 @@ export default function HistorialMovimientos() {
         const response = await api.get('/auditoria');
         setHistorial(response.data);
       } catch (error: any) {
-        if (error.response?.status === 401 || error.response?.status === 403) navigate('/');
+        if (error.response?.status === 401) navigate('/');
+        else if (error.response?.status === 403) navigate('/menu');
       } finally {
         setCargando(false);
       }

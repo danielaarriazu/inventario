@@ -14,10 +14,10 @@ const ITEMS_BASE = [
   { path: '/menu', label: 'Menú Principal', icon: Home },
   { path: '/dashboard', label: 'Administrar (Destinos)', icon: LayoutDashboard },
   { path: '/dashboard/equipos', label: 'Equipos', icon: Monitor },
-  { path: '/dashboard/historial', label: 'Historial de Movimientos', icon: History },
   { path: '/movimientos', label: 'Movimientos', icon: Wrench },
 ];
 const ITEM_AUXILIARES = { path: '/dashboard/auxiliares', label: 'Auxiliares', icon: Users };
+const ITEM_HISTORIAL = { path: '/dashboard/historial', label: 'Historial de Movimientos', icon: History };
 
 // Drawer lateral con acceso directo a todas las secciones — se abre desde
 // el botón de hamburguesa en la barra superior de cada pantalla principal
@@ -33,7 +33,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   }, []);
 
   const items = esResponsable
-    ? [...ITEMS_BASE.slice(0, 3), ITEM_AUXILIARES, ...ITEMS_BASE.slice(3)]
+    ? [...ITEMS_BASE.slice(0, 3), ITEM_AUXILIARES, ITEM_HISTORIAL, ...ITEMS_BASE.slice(3)]
     : ITEMS_BASE;
 
   const handleLogout = () => {
