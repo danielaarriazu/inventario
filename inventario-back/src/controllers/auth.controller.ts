@@ -45,6 +45,11 @@ export const registrarAuxiliar = async (req: Request, res: Response): Promise<vo
       return;
     }
 
+    if (!/^\d+$/.test(mr)) {
+      res.status(400).json({ error: 'La matrícula (MR) tiene que ser solo números' });
+      return;
+    }
+
     // Verificamos si la matrícula ya está registrada
     const existeUsuario = await prisma.usuario.findUnique({ where: { mr } });
     if (existeUsuario) {
