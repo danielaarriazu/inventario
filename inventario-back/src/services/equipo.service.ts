@@ -102,7 +102,10 @@ const CODIGO_DOMINIO: Record<string, string> = {
 };
 
 export const crearEquipo = async (data: any, id_cargo: number) => {
-  const oficina = await prisma.oficina.findUnique({ where: { id_oficina: data.id_oficina } });
+  const oficina = await prisma.oficina.findUnique({
+    where: { id_oficina: data.id_oficina },
+    include: { division: true }
+  });
   if (!oficina) {
     throw new Error('La oficina seleccionada no existe');
   }
@@ -128,9 +131,31 @@ export const crearEquipo = async (data: any, id_cargo: number) => {
   const correlativo = cantidadExistente + 1;
   const nombreGenerado = `${oficina.numero_oficina}.${codigoDominio}${correlativo}`;
 
+  // Los equipos sin dominio real (conexión directa a Internet) se venían
+  // anotando a mano como "ADMIN" — ahora, si escriben eso con esa conexión,
+  // el número de patrimonio se arma solo: {abreviatura de la división}-admin-{correlativo}
+  let numeroEquipoFinal = data.numero_equipo;
+  if (data.dominio_conexion === 'INTERNET' && data.numero_equipo?.trim().toUpperCase() === 'ADMIN') {
+    const prefijo = `${oficina.division.abreviatura}-admin-`;
+    const cantidadAdmin = await prisma.planilla_Equipo.count({
+      where: {
+        numero_equipo: { startsWith: prefijo },
+        oficina: {
+          division: {
+            departamento: {
+              destino: { id_cargo }
+            }
+          }
+        }
+      }
+    });
+    numeroEquipoFinal = `${prefijo}${cantidadAdmin + 1}`;
+  }
+
   return await prisma.planilla_Equipo.create({
     data: {
       ...data,
+      numero_equipo: numeroEquipoFinal,
       nombre_equipo: nombreGenerado,
       correlativo_dominio: correlativo
     }

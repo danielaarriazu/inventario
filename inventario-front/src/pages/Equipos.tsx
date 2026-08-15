@@ -131,7 +131,10 @@ export default function Equipos() {
               </button>
             )}
             <button
-              onClick={() => navigate('/dashboard/equipos/nuevo')}
+              onClick={() => navigate(
+                '/dashboard/equipos/nuevo',
+                idOficina ? { state: { idOficinaFija: Number(idOficina), numeroOficinaFija: numeroOficina } } : undefined
+              )}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
             >
               <PlusCircle className="w-4 h-4" /> Nuevo Equipo

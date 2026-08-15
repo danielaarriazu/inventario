@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import CampoMultilinea from '../components/CampoMultilinea';
 import Navbar from '../components/Navbar';
@@ -11,8 +11,15 @@ const labelClass = "text-xs font-bold text-texto-sec uppercase tracking-wide blo
 
 export default function AltaPlanilla() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const oficinaDesdeContexto = location.state as { idOficinaFija?: number; numeroOficinaFija?: string } | null;
+
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
+
+  // Si llegamos con una oficina ya elegida (navegando desde esa oficina),
+  // arranca fija y no hace falta repetir la cascada
+  const [oficinaFija, setOficinaFija] = useState(!!oficinaDesdeContexto?.idOficinaFija);
 
   const [destinos, setDestinos] = useState<OpcionSimple[]>([]);
   const [departamentos, setDepartamentos] = useState<OpcionSimple[]>([]);
@@ -86,7 +93,8 @@ export default function AltaPlanilla() {
     e.preventDefault();
     setError('');
 
-    if (!selOficina) { setError('Elegí la oficina donde va a estar el equipo'); return; }
+    const idOficinaFinal = oficinaFija ? oficinaDesdeContexto?.idOficinaFija : Number(selOficina);
+    if (!idOficinaFinal) { setError('Elegí la oficina donde va a estar el equipo'); return; }
     if (!form.numero_equipo || !form.usuario_responsable || !form.nombre_usuario_red || !form.procesador || !form.ram_capacidad || !form.disco) {
       setError('Completá todos los campos obligatorios');
       return;
@@ -101,7 +109,7 @@ export default function AltaPlanilla() {
         monitor_tamano: conGuion(form.monitor_tamano),
         impresora_modelo: conGuion(form.impresora_modelo),
         impresora_insumos: conGuion(form.impresora_insumos),
-        id_oficina: Number(selOficina),
+        id_oficina: idOficinaFinal,
         hardware_otros: hardwareOtros.filter(v => v.trim()).join('\n') || null,
         perifericos_otros: perifericosOtros.filter(v => v.trim()).join('\n') || null,
       });
@@ -124,29 +132,53 @@ export default function AltaPlanilla() {
 
           <div className="bg-superficie border border-borde rounded-xl p-5">
             <h3 className="text-xs font-bold text-acento uppercase tracking-wide mb-3">Ubicación y responsable</h3>
-            <label className={labelClass}>Ubicación <span className="text-baja">*</span></label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-              <select value={selDestino} onChange={e => setSelDestino(e.target.value)} className={inputClass}>
-                <option value="">Destino...</option>
-                {destinos.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
-              </select>
-              <select value={selDepartamento} onChange={e => setSelDepartamento(e.target.value)} disabled={!selDestino} className={`${inputClass} disabled:opacity-50`}>
-                <option value="">Departamento...</option>
-                {departamentos.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
-              </select>
-              <select value={selDivision} onChange={e => setSelDivision(e.target.value)} disabled={!selDepartamento} className={`${inputClass} disabled:opacity-50`}>
-                <option value="">División...</option>
-                {divisiones.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
-              </select>
-              <select value={selOficina} onChange={e => setSelOficina(e.target.value)} disabled={!selDivision} className={`${inputClass} disabled:opacity-50`}>
-                <option value="">Oficina...</option>
-                {oficinas.map(o => <option key={o.id} value={o.id}>{o.nombre}</option>)}
-              </select>
-            </div>
+
+            {oficinaFija ? (
+              <div className="flex items-center justify-between bg-champagne/40 border border-champagne rounded-lg p-3 mb-3">
+                <span className="text-sm font-bold text-primario">
+                  📍 Oficina {oficinaDesdeContexto?.numeroOficinaFija ?? oficinaDesdeContexto?.idOficinaFija}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOficinaFija(false)}
+                  className="text-xs font-bold text-acento hover:underline cursor-pointer"
+                >
+                  Cambiar
+                </button>
+              </div>
+            ) : (
+              <>
+                <label className={labelClass}>Ubicación <span className="text-baja">*</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                  <select value={selDestino} onChange={e => setSelDestino(e.target.value)} className={inputClass}>
+                    <option value="">Destino...</option>
+                    {destinos.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
+                  </select>
+                  <select value={selDepartamento} onChange={e => setSelDepartamento(e.target.value)} disabled={!selDestino} className={`${inputClass} disabled:opacity-50`}>
+                    <option value="">Departamento...</option>
+                    {departamentos.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
+                  </select>
+                  <select value={selDivision} onChange={e => setSelDivision(e.target.value)} disabled={!selDepartamento} className={`${inputClass} disabled:opacity-50`}>
+                    <option value="">División...</option>
+                    {divisiones.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
+                  </select>
+                  <select value={selOficina} onChange={e => setSelOficina(e.target.value)} disabled={!selDivision} className={`${inputClass} disabled:opacity-50`}>
+                    <option value="">Oficina...</option>
+                    {oficinas.map(o => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+                  </select>
+                </div>
+              </>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>N° de Equipo <span className="text-baja">*</span></label>
                 <input value={form.numero_equipo} onChange={e => setCampo('numero_equipo', e.target.value)} placeholder="Ej: SGNAWI0001" className={inputClass} />
+                {form.dominio_conexion === 'INTERNET' && (
+                  <p className="text-[11px] text-texto-sec mt-1">
+                    ¿Sin dominio real? Escribí <b>ADMIN</b> y se numera solo (ej: PPFF-admin-1).
+                  </p>
+                )}
               </div>
               <div>
                 <label className={labelClass}>Usuario Responsable <span className="text-baja">*</span></label>
