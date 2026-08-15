@@ -8,6 +8,7 @@ interface Equipo {
   numero_equipo: string;
 }
 
+
 export default function ImprimirQRsOficina() {
   const { idOficina } = useParams();
   const navigate = useNavigate();
