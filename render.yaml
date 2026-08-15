@@ -4,7 +4,9 @@ services:
     env: node
     plan: free
     rootDir: inventario-back
-    buildCommand: npm install && npm run build && npx prisma db push
+    # Compila el frontend primero (queda en inventario-front/dist), después
+    # compila y prepara el backend, que sirve ambas cosas desde un mismo servicio
+    buildCommand: cd ../inventario-front && npm install && npm run build && cd ../inventario-back && npm install && npx prisma generate && npm run build && npx prisma db push
     startCommand: npm start
     envVars:
       - key: DATABASE_URL
@@ -12,18 +14,4 @@ services:
       - key: DIRECT_URL
         sync: false
       - key: FRONTEND_URL
-        value: https://inventario-wju6.onrender.com
-
-  - type: web
-    name: inventario-frontend
-    runtime: static
-    rootDir: inventario-front
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        value: https://inventario-backend.onrender.com/api
+        value: https://inventario-backend.onrender.com

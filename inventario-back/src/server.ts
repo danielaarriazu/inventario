@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cros from 'cors';
+import path from 'path';
 import destinoRoutes from './routes/destino.routes';
 import departamentoRoutes from './routes/departamento.routes';
 import divisionRoutes from './routes/division.routes';
@@ -45,6 +46,20 @@ app.use('/api/reportes', reporteRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cargo', cargoRoutes);
 app.use('/api/publico', publicoRoutes);
+
+// A partir de acá, front y back viven en el mismo servicio — servimos el
+// build del frontend directamente desde acá, en vez de depender del
+// mecanismo de "Static Site" de Render (que no estaba aplicando bien el
+// rewrite pese a estar configurado correctamente).
+const frontendDistPath = path.join(__dirname, '../../inventario-front/dist');
+app.use(express.static(frontendDistPath));
+
+// Comodín: cualquier ruta que NO sea /api (todas las pantallas de React)
+// devuelve el index.html, para que React Router se haga cargo del resto.
+// Va al final a propósito, después de todas las rutas /api de arriba.
+app.get('/*splat', (req, res) => {
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 
