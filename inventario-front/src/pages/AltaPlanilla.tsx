@@ -176,7 +176,7 @@ export default function AltaPlanilla() {
                 <input value={form.numero_equipo} onChange={e => setCampo('numero_equipo', e.target.value)} placeholder="Ej: SGNAWI0001" className={inputClass} />
                 {form.dominio_conexion === 'INTERNET' && (
                   <p className="text-[11px] text-texto-sec mt-1">
-                    ¿Sin dominio real? Escribí <b>ADMIN</b> y se numera solo (ej: PPFF-admin-1).
+                    ¿Sin dominio real? Escribí <b>ADMIN</b> y se numera solo.
                   </p>
                 )}
               </div>

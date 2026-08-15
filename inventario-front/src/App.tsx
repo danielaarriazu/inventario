@@ -14,6 +14,7 @@ import AltaPlanilla from './pages/AltaPlanilla';
 import Ficha from './pages/Ficha';
 import ImprimirFicha from './pages/ImprimirFicha';
 import ImprimirOficina from './pages/ImprimirOficina';
+import ImprimirQRsOficina from './pages/ImprimirQRsOficina';
 import HistorialMovimientos from './pages/HistorialMovimientos';
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path="/equipos/:id" element={<RutaProtegida><Ficha /></RutaProtegida>} />
           <Route path="/equipos/:id/imprimir" element={<RutaProtegida><ImprimirFicha /></RutaProtegida>} />
           <Route path="/dashboard/oficinas/:idOficina/imprimir" element={<RutaProtegida><ImprimirOficina /></RutaProtegida>} />
+          <Route path="/dashboard/oficinas/:idOficina/imprimir-qrs" element={<RutaProtegida><ImprimirQRsOficina /></RutaProtegida>} />
           <Route path="/dashboard/historial" element={<RutaProtegida><HistorialMovimientos /></RutaProtegida>} />
 
           {/* Cualquier ruta que no matchee con nada de arriba — en vez de

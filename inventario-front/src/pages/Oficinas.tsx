@@ -4,7 +4,7 @@ import api from '../services/api';
 import ModalNuevaOficina from '../components/ModalnuevaOficina';
 import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { DoorOpen, PlusCircle, Printer, Search, Pencil, Monitor } from 'lucide-react';
+import { DoorOpen, PlusCircle, Printer, Search, Pencil, Monitor, QrCode } from 'lucide-react';
 
 interface Oficina {
   id_oficina: number;
@@ -137,6 +137,18 @@ export default function Oficinas() {
                       className="text-texto-sec hover:text-acento cursor-pointer"
                     >
                       <Printer className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/dashboard/oficinas/${of.id_oficina}/imprimir-qrs`, {
+                          state: { numeroOficina: of.numero_oficina }
+                        });
+                      }}
+                      title="Imprimir solo los QR de esta oficina"
+                      className="text-texto-sec hover:text-acento cursor-pointer"
+                    >
+                      <QrCode className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
