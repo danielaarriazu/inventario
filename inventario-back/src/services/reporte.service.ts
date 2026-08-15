@@ -1,7 +1,7 @@
 import prisma from '../config/db';
 import ExcelJS from 'exceljs';
 
-export const generarExcelInventario = async (id_cargo: number) => {
+export const generarExcelInventario = async (id_cargo: number, id_departamento?: number) => {
   // 1. Traemos todos los equipos activos (sin los de BAJA) con su ruta completa
   const equipos = await prisma.planilla_Equipo.findMany({
     where: { 
@@ -9,6 +9,7 @@ export const generarExcelInventario = async (id_cargo: number) => {
       oficina: {
         division: {
           departamento: {
+            ...(id_departamento ? { id_departamento } : {}),
             destino: {
               id_cargo 
             }

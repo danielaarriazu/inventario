@@ -4,7 +4,8 @@ import * as reporteService from '../services/reporte.service';
 export const exportarExcel = async (req: Request, res: Response) => {
   try {
     const id_cargo = req.usuario!.id_cargo;
-    const buffer = await reporteService.generarExcelInventario(id_cargo);
+    const id_departamento = req.query.id_departamento ? parseInt(req.query.id_departamento as string, 10) : undefined;
+    const buffer = await reporteService.generarExcelInventario(id_cargo, id_departamento);
     
     // Le decimos al navegador que esto es un archivo de Microsoft Excel
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -45,7 +45,7 @@ export const obtenerConteosPorNivel = async (id_cargo: number) => {
   return { porDestino, porDepartamento, porDivision, porOficina };
 };
 
-export const obtenerEquipos = async (id_cargo: number, id_oficina?: number) => {
+export const obtenerEquipos = async (id_cargo: number, id_oficina?: number, id_destino?: number) => {
   return await prisma.planilla_Equipo.findMany({
     where: {
       // Magia de Prisma: Buscamos solo los equipos cuyo destino pertenezca a este cargo
@@ -53,7 +53,8 @@ export const obtenerEquipos = async (id_cargo: number, id_oficina?: number) => {
         division: {
           departamento: {
             destino: {
-              id_cargo: id_cargo
+              id_cargo: id_cargo,
+              ...(id_destino ? { id_destino } : {})
             }
           }
         }

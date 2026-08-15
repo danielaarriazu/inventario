@@ -5,7 +5,8 @@ export const getEquipos = async (req: Request, res: Response) => {
   try {
     const id_cargo = req.usuario!.id_cargo;
     const id_oficina = req.query.id_oficina ? parseInt(req.query.id_oficina as string, 10) : undefined;
-    const equipos = await equipoService.obtenerEquipos(id_cargo, id_oficina);
+    const id_destino = req.query.id_destino ? parseInt(req.query.id_destino as string, 10) : undefined;
+    const equipos = await equipoService.obtenerEquipos(id_cargo, id_oficina, id_destino);
     res.status(200).json(equipos);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener la planilla de equipos' });

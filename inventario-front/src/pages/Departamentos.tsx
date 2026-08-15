@@ -4,7 +4,7 @@ import api from '../services/api';
 import ModalNuevoDepartamento from '../components/ModalNuevoDepartamento';
 import ModalRenombrar from '../components/ModalRenombrar';
 import Navbar from '../components/Navbar';
-import { Building2, PlusCircle, Search, Pencil, Monitor } from 'lucide-react';
+import { Building2, PlusCircle, Search, Pencil, Monitor, FileSpreadsheet } from 'lucide-react';
 
 interface Departamento {
   id_departamento: number;
@@ -25,11 +25,31 @@ export default function Departamentos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [renombrando, setRenombrando] = useState<Departamento | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
+  const [descargando, setDescargando] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
   }, []);
+
+  const handleDescargarExcel = async (idDepartamento: number) => {
+    setDescargando(idDepartamento);
+    try {
+      const response = await api.get(`/reportes/excel?id_departamento=${idDepartamento}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Inventario_Equipos.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al descargar el Excel', error);
+    } finally {
+      setDescargando(null);
+    }
+  };
 
   const fetchDepartamentos = async () => {
     setCargando(true);
@@ -68,14 +88,22 @@ export default function Departamentos() {
             <p className="text-sm text-texto-sec mt-1">Estructura interna del destino.</p>
           </div>
 
-          {perfil?.rol === 'RESPONSABLE' && (
+          <div className="flex gap-3 w-full sm:w-auto">
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
+              onClick={() => navigate(`/dashboard/equipos?id_destino=${idDestino}`, { state: { nombreDestino } })}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
             >
-              <PlusCircle className="w-4 h-4" /> Nuevo Departamento
+              <Monitor className="w-4 h-4" /> Ver Equipos
             </button>
-          )}
+            {perfil?.rol === 'RESPONSABLE' && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
+              >
+                <PlusCircle className="w-4 h-4" /> Nuevo Departamento
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="relative mb-4">
@@ -119,13 +147,23 @@ export default function Departamentos() {
                       <Monitor className="w-3 h-3" /> {depto.cantidad_equipos}
                     </span>
                     {perfil?.rol === 'RESPONSABLE' && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setRenombrando(depto); }}
-                        className="text-texto-sec hover:text-acento cursor-pointer"
-                        title="Renombrar"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDescargarExcel(depto.id_departamento); }}
+                          disabled={descargando === depto.id_departamento}
+                          className="text-texto-sec hover:text-acento cursor-pointer disabled:opacity-50"
+                          title="Descargar Excel de este departamento"
+                        >
+                          <FileSpreadsheet className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setRenombrando(depto); }}
+                          className="text-texto-sec hover:text-acento cursor-pointer"
+                          title="Renombrar"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

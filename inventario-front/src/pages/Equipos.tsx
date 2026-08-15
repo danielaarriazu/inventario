@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
-import { Search, PlusCircle, FileSpreadsheet } from 'lucide-react';
+import { Search, PlusCircle } from 'lucide-react';
 
 interface Equipo {
   id_planilla: number;
@@ -15,7 +15,6 @@ interface Equipo {
   estado_equipo: 'ACTIVO' | 'REPARACION' | 'BAJA';
   oficina?: { numero_oficina: string };
 }
-interface Perfil { nombre_apellido: string; mr: string; rol: string; }
 
 const ESTADO_ESTILOS: Record<string, string> = {
   ACTIVO: 'bg-activo text-white',
@@ -41,24 +40,24 @@ export default function Equipos() {
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState<'TODOS' | 'ACTIVO' | 'REPARACION' | 'BAJA'>('TODOS');
   const [filtroConexion, setFiltroConexion] = useState<typeof CONEXIONES[number]>('TODAS');
-  const [descargando, setDescargando] = useState(false);
   const [cargando, setCargando] = useState(true);
-  const [perfil, setPerfil] = useState<Perfil | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
 
-  useEffect(() => {
-    api.get('/auth/me').then(res => setPerfil(res.data)).catch(() => {});
-  }, []);
-
   const idOficina = searchParams.get('id_oficina');
+  const idDestino = searchParams.get('id_destino');
   const numeroOficina = (location.state as { numeroOficina?: string })?.numeroOficina;
+  const nombreDestino = (location.state as { nombreDestino?: string })?.nombreDestino;
 
   const fetchEquipos = async () => {
     setCargando(true);
     try {
-      const url = idOficina ? `/equipos?id_oficina=${idOficina}` : '/equipos';
+      const url = idOficina
+        ? `/equipos?id_oficina=${idOficina}`
+        : idDestino
+        ? `/equipos?id_destino=${idDestino}`
+        : '/equipos';
       const response = await api.get(url);
       setEquipos(response.data);
     } catch (error: any) {
@@ -68,26 +67,7 @@ export default function Equipos() {
     }
   };
 
-  useEffect(() => { fetchEquipos(); }, [idOficina]);
-
-  const handleDescargarExcel = async () => {
-    setDescargando(true);
-    try {
-      const response = await api.get('/reportes/excel', { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'Inventario_Equipos.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error al descargar el Excel', error);
-    } finally {
-      setDescargando(false);
-    }
-  };
+  useEffect(() => { fetchEquipos(); }, [idOficina, idDestino]);
 
   const equiposFiltrados = equipos.filter(eq => {
     const pasaEstado = filtroEstado === 'TODOS' || eq.estado_equipo === filtroEstado;
@@ -104,7 +84,7 @@ export default function Equipos() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <Navbar titulo="Equipos" onBack={idOficina ? () => navigate(-1) : undefined} />
+      <Navbar titulo="Equipos" onBack={(idOficina || idDestino) ? () => navigate(-1) : undefined} />
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
         {idOficina && (
@@ -114,22 +94,20 @@ export default function Equipos() {
             </span>
           </div>
         )}
+        {!idOficina && idDestino && (
+          <div className="bg-champagne/40 border border-champagne rounded-lg px-4 py-2.5 mb-4 text-sm">
+            <span className="font-bold text-primario">
+              Equipos de {nombreDestino ?? `Destino ${idDestino}`}
+            </span>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 bg-superficie p-6 rounded-xl border border-borde shadow-sm">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-primario">Equipos</h2>
-            <p className="text-sm text-texto-sec mt-1">Buscá, revisá o descargá el inventario completo.</p>
+            <p className="text-sm text-texto-sec mt-1">Buscá o revisá el inventario.</p>
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
-            {perfil?.rol === 'RESPONSABLE' && (
-              <button
-                onClick={handleDescargarExcel}
-                disabled={descargando}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-superficie hover:bg-fondo text-acento border border-acento/40 font-bold px-4 py-2.5 rounded-lg transition-colors cursor-pointer text-sm disabled:opacity-60"
-              >
-                <FileSpreadsheet className="w-4 h-4" /> {descargando ? 'Generando...' : 'Descargar Excel'}
-              </button>
-            )}
             <button
               onClick={() => navigate(
                 '/dashboard/equipos/nuevo',

@@ -12,7 +12,7 @@ interface SidebarProps {
 
 const ITEMS_BASE = [
   { path: '/menu', label: 'Menú Principal', icon: Home },
-  { path: '/dashboard', label: 'Administrar (Destinos)', icon: LayoutDashboard },
+  { path: '/dashboard', label: 'Destinos', icon: LayoutDashboard },
   { path: '/dashboard/equipos', label: 'Equipos', icon: Monitor },
   { path: '/movimientos', label: 'Movimientos', icon: Wrench },
 ];
