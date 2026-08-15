@@ -51,7 +51,12 @@ app.use('/api/publico', publicoRoutes);
 // build del frontend directamente desde acá, en vez de depender del
 // mecanismo de "Static Site" de Render (que no estaba aplicando bien el
 // rewrite pese a estar configurado correctamente).
-const frontendDistPath = path.join(__dirname, '../../inventario-front/dist');
+// OJO: tiene que apuntar a una carpeta DENTRO de inventario-back (el
+// rootDir del servicio en Render) — todo lo que quede afuera del rootDir
+// no sobrevive al runtime, aunque sí exista durante el build. Por eso el
+// build command copia el resultado del build del frontend hacia acá adentro
+// (a "public"), en vez de dejarlo en inventario-front/dist.
+const frontendDistPath = path.join(__dirname, '../public');
 app.use(express.static(frontendDistPath));
 
 // Comodín: cualquier ruta que NO sea /api (todas las pantallas de React)

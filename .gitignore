@@ -3,3 +3,7 @@ node_modules
 .env
 dist
 /generated/prisma
+# Carpeta generada en cada build (el frontend compilado, copiado adentro
+# del backend para que sobreviva al runtime en Render) — no es del frontend,
+# ese sigue versionado normalmente
+inventario-back/public/

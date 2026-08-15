@@ -4,9 +4,10 @@ services:
     env: node
     plan: free
     rootDir: inventario-back
-    # Compila el frontend primero (queda en inventario-front/dist), después
-    # compila y prepara el backend, que sirve ambas cosas desde un mismo servicio
-    buildCommand: cd ../inventario-front && npm install && npm run build && cd ../inventario-back && npm install && npx prisma generate && npm run build && npx prisma db push
+    # Compila el frontend, copia el resultado ADENTRO de inventario-back
+    # (a public/) porque todo lo que quede afuera del rootDir no sobrevive
+    # al runtime en Render, y recién ahí compila y prepara el backend
+    buildCommand: cd ../inventario-front && npm install && npm run build && cd ../inventario-back && rm -rf public && cp -r ../inventario-front/dist ./public && npm install && npx prisma generate && npm run build && npx prisma db push
     startCommand: npm start
     envVars:
       - key: DATABASE_URL
