@@ -416,7 +416,7 @@ export const generarQrEquipo = async (id_planilla: number) => {
   }
 
   const frontendUrl = (process.env.FRONTEND_URL || 'https://inventario-wju6.onrender.com').replace(/\/$/, '');
-  const urlDestino = `${frontendUrl}/equipos/${id_planilla}`;
+  const urlDestino = `${frontendUrl}/publico/equipos/${id_planilla}`;
 
   const qrBase64 = await QRCode.toDataURL(urlDestino, {
     margin: 1,

@@ -10,6 +10,7 @@ import auditoriaRoutes from './routes/auditoria.routes';
 import reporteRoutes from './routes/reporte.routes';
 import authRoutes from './routes/auth.routes';
 import cargoRoutes from './routes/cargo.routes';
+import publicoRoutes from './routes/publico.routes';
 
 
 import swaggerUi from 'swagger-ui-express';
@@ -43,6 +44,7 @@ app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/reportes', reporteRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cargo', cargoRoutes);
+app.use('/api/publico', publicoRoutes);
 
 const PORT = process.env.PORT || 3000;
 

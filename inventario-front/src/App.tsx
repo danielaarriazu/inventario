@@ -15,6 +15,8 @@ import Ficha from './pages/Ficha';
 import ImprimirFicha from './pages/ImprimirFicha';
 import ImprimirOficina from './pages/ImprimirOficina';
 import ImprimirQRsOficina from './pages/ImprimirQRsOficina';
+import FichaPublica from './pages/FichaPublica';
+import ImprimirFichaPublica from './pages/ImprimirFichaPublica';
 import HistorialMovimientos from './pages/HistorialMovimientos';
 
 function App() {
@@ -28,6 +30,11 @@ function App() {
           <Route path="/registro" element={
             <div className="flex-grow flex items-center justify-center"><RegistroCargo /></div>
           } />
+
+          {/* Rutas públicas — a las que llega alguien que escaneó el QR,
+              sin necesidad de login. Deliberadamente fuera de RutaProtegida */}
+          <Route path="/publico/equipos/:id" element={<FichaPublica />} />
+          <Route path="/publico/equipos/:id/imprimir" element={<ImprimirFichaPublica />} />
 
           <Route path="/dashboard" element={<RutaProtegida><Dashboard /></RutaProtegida>} />
           <Route path="/menu" element={<RutaProtegida><Menu /></RutaProtegida>} />
