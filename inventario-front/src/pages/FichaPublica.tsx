@@ -155,7 +155,7 @@ export default function FichaPublica() {
       </nav>
 
       <div className="bg-champagne/40 border-b border-champagne px-4 py-2 text-center text-[11px] text-primario font-semibold">
-        Acceso público — solo para ver e imprimir esta ficha, no se puede modificar nada desde acá
+        Acá podes ver la ficha de tu equipo y su historial de movimientos.
       </div>
 
       <main className="p-6 max-w-5xl mx-auto w-full flex-grow">

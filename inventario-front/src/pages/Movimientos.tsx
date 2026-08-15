@@ -237,6 +237,9 @@ export default function Movimientos() {
         payload.cambios = {
           numero_equipo: componentes.numero_equipo,
           nombre_usuario_red: componentes.nombre_usuario_red,
+          dominio_conexion: componentes.dominio_conexion,
+          sistema_operativo: componentes.sistema_operativo,
+          arquitectura: componentes.arquitectura,
           procesador: componentes.procesador,
           ram_capacidad: componentes.ram_capacidad,
           tipo_ram: componentes.tipo_ram,
@@ -468,6 +471,32 @@ export default function Movimientos() {
                     <div>
                       <label className={labelClass}>Usuario de Red</label>
                       <input value={componentes.nombre_usuario_red ?? ''} onChange={e => setCampoComponente('nombre_usuario_red', e.target.value)} className={inputClass} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div>
+                      <label className={labelClass}>Dominio</label>
+                      <select value={componentes.dominio_conexion ?? ''} onChange={e => setCampoComponente('dominio_conexion', e.target.value)} className={inputClass}>
+                        <option value="RINA">RINA</option>
+                        <option value="INTERNET_ARA">Internet ARA</option>
+                        <option value="INTERNET">Internet</option>
+                        <option value="SIN_CONEXION">Sin conexión</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Sistema Operativo</label>
+                      <select value={componentes.sistema_operativo ?? ''} onChange={e => setCampoComponente('sistema_operativo', e.target.value)} className={inputClass}>
+                        <option value="WINDOWS_11">Windows 11</option>
+                        <option value="WINDOWS_10">Windows 10</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Arquitectura</label>
+                      <select value={componentes.arquitectura ?? ''} onChange={e => setCampoComponente('arquitectura', e.target.value)} className={inputClass}>
+                        <option value="BITS_64">64 bits</option>
+                        <option value="BITS_32">32 bits</option>
+                      </select>
                     </div>
                   </div>
 

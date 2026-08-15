@@ -185,6 +185,27 @@ export const actualizarEquipo = async (
     throw new Error('Este equipo está dado de baja y no se puede modificar');
   }
 
+  // Misma numeración automática que en el alta: si ahora queda con
+  // conexión INTERNET y escriben "ADMIN", se arma solo el número de
+  // patrimonio — útil para corregir equipos viejos que no tenían este formato
+  const dominioEfectivo = data.dominio_conexion ?? equipoViejo.dominio_conexion;
+  if (data.numero_equipo && data.numero_equipo.trim().toUpperCase() === 'ADMIN' && dominioEfectivo === 'INTERNET') {
+    const oficina = await prisma.oficina.findUnique({
+      where: { id_oficina: equipoViejo.id_oficina },
+      include: { division: true }
+    });
+    if (oficina) {
+      const prefijo = `${oficina.division.abreviatura}-admin-`;
+      const cantidadAdmin = await prisma.planilla_Equipo.count({
+        where: {
+          numero_equipo: { startsWith: prefijo },
+          NOT: { id_planilla }
+        }
+      });
+      data.numero_equipo = `${prefijo}${cantidadAdmin + 1}`;
+    }
+  }
+
   const cambiosRealizados: any = {};
   for (const key in data) {
     if (data[key] !== (equipoViejo as any)[key]) {

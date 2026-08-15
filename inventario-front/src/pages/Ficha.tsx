@@ -101,6 +101,34 @@ const formatearCambios = (h: HistorialItem): string[] => {
 const inputClass = "w-full p-2 border border-borde rounded text-sm bg-superficie focus:outline-none focus:ring-2 focus:ring-acento text-tinta";
 const labelClass = "text-[10.5px] font-bold text-texto-sec uppercase tracking-wide block mb-1";
 
+// Campos que en la base son un enum de Prisma — al editar tienen que ser
+// un <select> con estas opciones exactas, no texto libre
+const OPCIONES_ENUM: Record<string, { value: string; label: string }[]> = {
+  dominio_conexion: [
+    { value: 'RINA', label: 'RINA' },
+    { value: 'INTERNET_ARA', label: 'Internet ARA' },
+    { value: 'INTERNET', label: 'Internet' },
+    { value: 'SIN_CONEXION', label: 'Sin conexión' },
+  ],
+  sistema_operativo: [
+    { value: 'WINDOWS_11', label: 'Windows 11' },
+    { value: 'WINDOWS_10', label: 'Windows 10' },
+  ],
+  arquitectura: [
+    { value: 'BITS_64', label: '64 bits' },
+    { value: 'BITS_32', label: '32 bits' },
+  ],
+  tipo_ram: [
+    { value: 'DDR5', label: 'DDR5' },
+    { value: 'DDR4', label: 'DDR4' },
+    { value: 'DDR3', label: 'DDR3' },
+    { value: 'DDR2', label: 'DDR2' },
+    { value: 'DDR', label: 'DDR' },
+  ],
+};
+const etiquetaEnum = (campo: string, valor: string) =>
+  OPCIONES_ENUM[campo]?.find(o => o.value === valor)?.label ?? valor;
+
 const aLista = (valor: string | null) => {
   const lista = (valor ?? '').split('\n').filter(v => v.trim());
   return lista.length > 0 ? lista : [''];
@@ -309,9 +337,17 @@ export default function Ficha() {
                     <div key={campo}>
                       <label className={labelClass}>{etiqueta}</label>
                       {editando ? (
-                        <input value={form[campo] ?? ''} onChange={e => setCampo(campo, e.target.value)} className={inputClass} />
+                        OPCIONES_ENUM[campo] ? (
+                          <select value={form[campo] ?? ''} onChange={e => setCampo(campo, e.target.value)} className={inputClass}>
+                            {OPCIONES_ENUM[campo].map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                          </select>
+                        ) : (
+                          <input value={form[campo] ?? ''} onChange={e => setCampo(campo, e.target.value)} className={inputClass} />
+                        )
                       ) : (
-                        <div className="text-sm font-semibold">{(equipo as any)[campo] || '—'}</div>
+                        <div className="text-sm font-semibold">
+                          {(equipo as any)[campo] ? etiquetaEnum(campo, (equipo as any)[campo]) : '—'}
+                        </div>
                       )}
                     </div>
                   ))}
