@@ -104,7 +104,7 @@ export default function Equipos() {
 
   return (
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
-      <Navbar titulo="Equipos" />
+      <Navbar titulo="Equipos" onBack={idOficina ? () => navigate(-1) : undefined} />
 
       <main className="p-8 max-w-7xl mx-auto mt-4 flex-grow w-full">
         {idOficina && (
