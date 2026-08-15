@@ -213,6 +213,10 @@ export default function ImprimirFicha() {
             </tr>
           </tbody>
         </table>
+        <div className="flex justify-between text-[10.5px] mt-2 px-1">
+          <span><b>Estado:</b> {equipo.estado_equipo}</span>
+          <span><b>Fecha de Alta:</b> {equipo.fecha_creacion ? new Date(equipo.fecha_creacion).toLocaleDateString('es-AR') : '—'}</span>
+        </div>
         </div>
       </div>
 
