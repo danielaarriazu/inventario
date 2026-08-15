@@ -73,7 +73,7 @@ export const iniciarSesion = async (mr: string, password_plana: string) => {
       id_cargo: usuario.id_cargo 
     },
     process.env.JWT_SECRET || 'secreto_default',
-    { expiresIn: '12h' } // La sesión dura 12 horas
+    { expiresIn: '8h' } // La sesión dura 8 horas (una jornada laboral)
   );
 
   return { 
