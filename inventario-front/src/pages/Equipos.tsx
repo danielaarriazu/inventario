@@ -49,6 +49,7 @@ export default function Equipos() {
   const idDestino = searchParams.get('id_destino');
   const numeroOficina = (location.state as { numeroOficina?: string })?.numeroOficina;
   const nombreDestino = (location.state as { nombreDestino?: string })?.nombreDestino;
+  const idDivision = (location.state as { idDivision?: number })?.idDivision;
 
   const fetchEquipos = async () => {
     setCargando(true);
@@ -111,7 +112,7 @@ export default function Equipos() {
             <button
               onClick={() => navigate(
                 '/dashboard/equipos/nuevo',
-                idOficina ? { state: { idOficinaFija: Number(idOficina), numeroOficinaFija: numeroOficina } } : undefined
+                idOficina ? { state: { idOficinaFija: Number(idOficina), numeroOficinaFija: numeroOficina, idDivision } } : undefined
               )}
               className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-primario hover:bg-primario-hover text-white font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer text-sm"
             >

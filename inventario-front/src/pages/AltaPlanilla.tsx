@@ -12,7 +12,7 @@ const labelClass = "text-xs font-bold text-texto-sec uppercase tracking-wide blo
 export default function AltaPlanilla() {
   const navigate = useNavigate();
   const location = useLocation();
-  const oficinaDesdeContexto = location.state as { idOficinaFija?: number; numeroOficinaFija?: string } | null;
+  const oficinaDesdeContexto = location.state as { idOficinaFija?: number; numeroOficinaFija?: string; idDivision?: number } | null;
 
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -113,7 +113,9 @@ export default function AltaPlanilla() {
         hardware_otros: hardwareOtros.filter(v => v.trim()).join('\n') || null,
         perifericos_otros: perifericosOtros.filter(v => v.trim()).join('\n') || null,
       });
-      navigate(`/equipos/${response.data.id_planilla}`);
+      navigate(`/equipos/${response.data.id_planilla}`, {
+        state: oficinaDesdeContexto?.idDivision ? { volverAOficinas: oficinaDesdeContexto.idDivision } : undefined
+      });
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al guardar el equipo');
       setGuardando(false);

@@ -105,7 +105,7 @@ export default function Oficinas() {
               <div
                 key={of.id_oficina}
                 onClick={() => navigate(`/dashboard/equipos?id_oficina=${of.id_oficina}`, {
-                  state: { numeroOficina: of.numero_oficina }
+                  state: { numeroOficina: of.numero_oficina, idDivision: Number(idDivision) }
                 })}
                 className="group bg-superficie p-6 rounded-xl border border-borde hover:border-acento/50 shadow-sm transition-colors cursor-pointer"
               >

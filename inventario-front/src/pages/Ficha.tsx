@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import CampoMultilinea from '../components/CampoMultilinea';
 import Navbar from '../components/Navbar';
@@ -138,6 +138,8 @@ const aTexto = (lista: string[]) => lista.filter(v => v.trim()).join('\n') || nu
 export default function Ficha() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const volverAOficinas = (location.state as { volverAOficinas?: number } | null)?.volverAOficinas;
 
   const [equipo, setEquipo] = useState<Equipo | null>(null);
   const [historial, setHistorial] = useState<HistorialItem[]>([]);
@@ -262,7 +264,9 @@ export default function Ficha() {
     <div className="min-h-screen bg-fondo text-tinta w-full flex flex-col">
       <Navbar
         titulo="Ficha de Equipo"
-        onBack={() => navigate('/dashboard/equipos')}
+        onBack={() => navigate(
+          volverAOficinas ? `/dashboard/divisiones/${volverAOficinas}/oficinas` : '/dashboard/equipos'
+        )}
         rightContent={
           <>
             {!editando && (
